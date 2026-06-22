@@ -1,0 +1,1314 @@
+/* ========================================================
+   🍳 美食视频工坊 Pro · Recipe Video Studio v2.0
+   Mobile-first food video generator with real images + audio
+   ======================================================== */
+
+/* ==================== STATE ==================== */
+const state = {
+  topic: '',
+  style: 'home',
+  duration: 30,
+  options: {
+    voice: true,
+    captions: true,
+    ingredients: true,
+    kenburns: true,
+    watermark: false,
+  },
+  watermark: '',
+  recipe: { title: '', subtitle: '', ingredients: [], steps: [] },
+  currentStepImageTarget: null,
+};
+
+/* ==================== FOOD IMAGES LIBRARY ==================== */
+/* 每个菜谱每个步骤的真实食物摄影图片 URL（来自 loremflickr 免费图库） */
+const foodImages = {
+  '番茄炒蛋': [
+    'https://loremflickr.com/720/1280/tomato?random=1',
+    'https://loremflickr.com/720/1280/tomatoes?random=2',
+    'https://loremflickr.com/720/1280/cooking-eggs?random=3',
+    'https://loremflickr.com/720/1280/frying-eggs?random=4',
+    'https://loremflickr.com/720/1280/tomato-cooking?random=5',
+    'https://loremflickr.com/720/1280/fried-eggs?random=6',
+  ],
+  '蛋炒饭': [
+    'https://loremflickr.com/720/1280/rice?random=10',
+    'https://loremflickr.com/720/1280/egg-fried-rice?random=11',
+    'https://loremflickr.com/720/1280/cooking-rice?random=12',
+    'https://loremflickr.com/720/1280/frying-pan?random=13',
+    'https://loremflickr.com/720/1280/fried-rice-plate?random=14',
+    'https://loremflickr.com/720/1280/rice-bowl?random=15',
+  ],
+  '红烧肉': [
+    'https://loremflickr.com/720/1280/pork-belly?random=20',
+    'https://loremflickr.com/720/1280/braised-pork?random=21',
+    'https://loremflickr.com/720/1280/cooking-meat?random=22',
+    'https://loremflickr.com/720/1280/braising-pot?random=23',
+    'https://loremflickr.com/720/1280/red-braised-pork?random=24',
+    'https://loremflickr.com/720/1280/chinese-pork-dish?random=25',
+  ],
+  '提拉米苏': [
+    'https://loremflickr.com/720/1280/tiramisu?random=30',
+    'https://loremflickr.com/720/1280/mascarpone-cheese?random=31',
+    'https://loremflickr.com/720/1280/coffee-cup?random=32',
+    'https://loremflickr.com/720/1280/dessert-plating?random=33',
+    'https://loremflickr.com/720/1280/cake-mousse?random=34',
+    'https://loremflickr.com/720/1280/chocolate-powder?random=35',
+  ],
+  '麻婆豆腐': [
+    'https://loremflickr.com/720/1280/tofu?random=40',
+    'https://loremflickr.com/720/1280/ground-beef?random=41',
+    'https://loremflickr.com/720/1280/chili-pepper?random=42',
+    'https://loremflickr.com/720/1280/sichuan-food?random=43',
+    'https://loremflickr.com/720/1280/mapodoufu?random=44',
+    'https://loremflickr.com/720/1280/spicy-tofu?random=45',
+  ],
+  '可乐鸡翅': [
+    'https://loremflickr.com/720/1280/chicken-wings?random=50',
+    'https://loremflickr.com/720/1280/chicken-cooking?random=51',
+    'https://loremflickr.com/720/1280/frying-chicken?random=52',
+    'https://loremflickr.com/720/1280/cola-drink?random=53',
+    'https://loremflickr.com/720/1280/braised-chicken?random=54',
+    'https://loremflickr.com/720/1280/chicken-dish?random=55',
+  ],
+  '葱油拌面': [
+    'https://loremflickr.com/720/1280/green-onion?random=60',
+    'https://loremflickr.com/720/1280/noodles-chinese?random=61',
+    'https://loremflickr.com/720/1280/cooking-oil?random=62',
+    'https://loremflickr.com/720/1280/scallion-oil?random=63',
+    'https://loremflickr.com/720/1280/chinese-noodles?random=64',
+    'https://loremflickr.com/720/1280/sesame-noodles?random=65',
+  ],
+};
+
+/* 通用步骤图库（按类型分类） */
+const genericStepImages = [
+  'https://loremflickr.com/720/1280/ingredients-prepare?random=100',
+  'https://loremflickr.com/720/1280/chopping-vegetables?random=101',
+  'https://loremflickr.com/720/1280/stir-fry?random=102',
+  'https://loremflickr.com/720/1280/cooking-process?random=103',
+  'https://loremflickr.com/720/1280/seasoning-spices?random=104',
+  'https://loremflickr.com/720/1280/plating-food?random=105',
+];
+
+/* ==================== RECIPE DATABASE ==================== */
+const recipeTemplates = {
+  '番茄炒蛋': {
+    subtitle: '家常菜的灵魂 · 酸甜开胃',
+    ingredients: [
+      { item: '新鲜番茄', amount: '3个', icon: '🍅' },
+      { item: '土鸡蛋', amount: '4个', icon: '🥚' },
+      { item: '小葱', amount: '2根', icon: '🌿' },
+      { item: '蒜末', amount: '3瓣', icon: '🧄' },
+      { item: '食用油', amount: '适量', icon: '🫒' },
+      { item: '食盐', amount: '少许', icon: '🧂' },
+      { item: '白糖', amount: '1勺', icon: '🍯' },
+    ],
+    steps: [
+      { caption: '番茄去蒂，表皮划十字花刀，开水烫30秒后剥皮。', voice: '番茄去蒂，表皮划十字，开水烫三十秒后剥皮。' },
+      { caption: '将番茄切成两厘米大小的块，便于炒出浓郁的汤汁。', voice: '将番茄切成两厘米大小的块，便于炒出浓郁的汤汁。' },
+      { caption: '鸡蛋打入碗中，加少许盐，用筷子快速打散至起细密泡沫。', voice: '鸡蛋加少许盐，打散至起细密泡沫，炒出来更加蓬松。' },
+      { caption: '热锅冷油，油温六成热倒入蛋液，大火快速翻炒至八成熟盛出。', voice: '热锅冷油，倒入蛋液大火快炒至八成熟，先盛出备用。' },
+      { caption: '锅中留底油，下蒜末小火炒香，再放番茄块翻炒至出红油。', voice: '原锅下蒜末炒香，放入番茄翻炒至出浓郁红油。' },
+      { caption: '加入糖和盐调味，倒入鸡蛋翻拌均匀，撒上葱花出锅装盘。', voice: '加糖和盐，倒入鸡蛋翻匀，撒上葱花即可出锅装盘。' },
+    ],
+  },
+  '蛋炒饭': {
+    subtitle: '粒粒分明 · 黄金诱人',
+    ingredients: [
+      { item: '隔夜米饭', amount: '2碗', icon: '🍚' },
+      { item: '鸡蛋', amount: '3个', icon: '🥚' },
+      { item: '葱花', amount: '适量', icon: '🌿' },
+      { item: '火腿丁', amount: '50g', icon: '🥓' },
+      { item: '食用油', amount: '3勺', icon: '🫒' },
+      { item: '食盐', amount: '适量', icon: '🧂' },
+      { item: '白胡椒粉', amount: '少许', icon: '🌶' },
+    ],
+    steps: [
+      { caption: '隔夜米饭用手轻轻打散，让每一粒米都颗颗分明。', voice: '隔夜米饭用手轻轻打散，让每一粒米都颗颗分明。' },
+      { caption: '鸡蛋打入碗中加少许盐搅拌均匀，葱切成细葱花备用。', voice: '鸡蛋加少许盐搅匀，葱切细花备用。' },
+      { caption: '平底锅烧热至微微冒烟，倒入冷油，油温上来后淋入蛋液迅速滑散。', voice: '锅烧热倒油，油温上来后淋入蛋液，迅速滑散。' },
+      { caption: '蛋液刚凝固时立即倒入米饭，大火翻炒让每粒米都裹上金黄蛋汁。', voice: '蛋液刚凝固就倒入米饭，大火翻炒让每粒米裹上金黄蛋汁。' },
+      { caption: '加入火腿丁继续翻炒约两分钟，让火腿的香气融入米饭中。', voice: '加入火腿丁继续翻炒两分钟，让火腿的香气充分释放。' },
+      { caption: '撒入葱花，调入盐和少许白胡椒粉，大火颠炒几下即可出锅。', voice: '撒葱花调味，大火颠炒几下，金黄蛋炒饭完成。' },
+    ],
+  },
+  '红烧肉': {
+    subtitle: '入口即化 · 肥而不腻',
+    ingredients: [
+      { item: '五花肉', amount: '600g', icon: '🥓' },
+      { item: '冰糖', amount: '30g', icon: '🍬' },
+      { item: '生抽', amount: '3勺', icon: '🫗' },
+      { item: '老抽', amount: '1勺', icon: '🫗' },
+      { item: '料酒', amount: '2勺', icon: '🍶' },
+      { item: '姜片', amount: '5片', icon: '🫚' },
+      { item: '八角', amount: '2颗', icon: '⭐' },
+    ],
+    steps: [
+      { caption: '五花肉切成三厘米见方的块，冷水下锅加姜片料酒焯水五分钟。', voice: '五花肉切三厘米方块，冷水下锅加姜片料酒焯水五分钟。' },
+      { caption: '捞出五花肉用温水冲洗干净并沥干水分，这样处理后口感清爽不油腻。', voice: '捞出用温水冲洗干净并沥干，这样处理后的肉口感清爽不油腻。' },
+      { caption: '锅中不放油，小火慢煸五花肉，让肥肉本身的油脂自然析出后盛出。', voice: '干锅小火慢煸五花肉，让肥肉本身的油脂自然析出后盛出。' },
+      { caption: '锅中留少许底油，放入冰糖小火慢慢炒出琥珀色的糖色。', voice: '底油中放冰糖，小火慢慢炒出琥珀色的糖色，香气四溢。' },
+      { caption: '倒入五花肉快速翻炒上色，加入香料和生抽老抽料酒。', voice: '倒入五花肉翻炒上色，加入香料和调味料让肉充分吸味。' },
+      { caption: '加入没过肉的热水，大火烧开后转最小火慢炖四十五分钟，最后大火收汁。', voice: '加热水没过肉，大火烧开转小火慢炖四十五分钟，最后大火收汁。' },
+    ],
+  },
+  '提拉米苏': {
+    subtitle: '经典意式甜品 · 层层惊喜',
+    ingredients: [
+      { item: '马斯卡彭奶酪', amount: '250g', icon: '🧀' },
+      { item: '手指饼干', amount: '200g', icon: '🍪' },
+      { item: '浓缩咖啡', amount: '150ml', icon: '☕' },
+      { item: '淡奶油', amount: '200ml', icon: '🥛' },
+      { item: '蛋黄', amount: '3个', icon: '🥚' },
+      { item: '细砂糖', amount: '60g', icon: '🍬' },
+      { item: '可可粉', amount: '适量', icon: '🍫' },
+    ],
+    steps: [
+      { caption: '蛋黄加细砂糖隔水加热，用打蛋器快速打发至颜色变浅体积变大。', voice: '蛋黄加糖隔水加热，快速打发至颜色变成漂亮的奶白色。' },
+      { caption: '加入马斯卡彭奶酪，用刮刀轻轻翻拌均匀至顺滑无颗粒状态。', voice: '加入马斯卡彭奶酪，轻轻翻拌成细腻柔滑的奶酪糊。' },
+      { caption: '淡奶油打发至六分发，呈现柔软的流动状态，与奶酪糊混合均匀。', voice: '淡奶油打至六分发，轻柔地与奶酪糊混合，口感更轻盈。' },
+      { caption: '浓缩咖啡冷却后倒入浅盘中，手指饼干快速蘸一下咖啡液铺在容器底层。', voice: '浓缩咖啡冷却后，手指饼干快速蘸一下铺在容器底层。' },
+      { caption: '在饼干上挤上一层奶酪糊，用刮刀抹平，再重复铺一层饼干和奶酪糊。', voice: '饼干上挤上奶酪糊抹平，再重复一次饼干和奶酪糊的层次。' },
+      { caption: '放入冰箱冷藏四小时以上，食用前均匀筛上无糖可可粉即可享用。', voice: '冷藏四小时让风味融合，食用前筛上浓郁的可可粉完成。' },
+    ],
+  },
+  '麻婆豆腐': {
+    subtitle: '麻辣鲜香 · 川菜经典',
+    ingredients: [
+      { item: '嫩豆腐', amount: '400g', icon: '🧈' },
+      { item: '牛肉末', amount: '100g', icon: '🥩' },
+      { item: '豆瓣酱', amount: '1勺', icon: '🫙' },
+      { item: '花椒粉', amount: '1小勺', icon: '🌶' },
+      { item: '蒜末', amount: '3瓣', icon: '🧄' },
+      { item: '葱花', amount: '适量', icon: '🌿' },
+      { item: '生抽', amount: '1勺', icon: '🫗' },
+      { item: '水淀粉', amount: '适量', icon: '💧' },
+    ],
+    steps: [
+      { caption: '豆腐切成两厘米见方的小块，用加了盐的开水焯一分钟捞出控水。', voice: '豆腐切小块，加盐开水焯一分钟捞出，去除豆腥气。' },
+      { caption: '热锅下油，放入牛肉末小火慢慢煸炒至变色酥脆，散发出浓郁肉香。', voice: '热油下牛肉末，小火慢慢煸炒至变色酥脆出香。' },
+      { caption: '加入蒜末和豆瓣酱小火炒出红油，让辣味与香气充分融合。', voice: '加蒜末豆瓣酱小火炒出红油，辣味香气完美融合。' },
+      { caption: '加入适量热水或高汤，放入豆腐块，轻轻推动让汤汁均匀包裹。', voice: '加汤水放入豆腐，轻推锅铲让汤汁均匀包裹每块豆腐。' },
+      { caption: '中小火烧三分钟让豆腐入味，淋入生抽和花椒粉调味提香。', voice: '中火烧三分钟让豆腐入味，淋生抽撒花椒粉调味。' },
+      { caption: '分两次淋入水淀粉勾薄芡，出锅前撒上葱花和花椒粉，麻辣鲜香。', voice: '分次淋入水淀粉勾薄芡，撒葱花花椒粉，麻辣鲜香完成。' },
+    ],
+  },
+  '可乐鸡翅': {
+    subtitle: '甜咸适口 · 零失败家常菜',
+    ingredients: [
+      { item: '鸡翅中', amount: '500g', icon: '🍗' },
+      { item: '可乐', amount: '1罐', icon: '🥤' },
+      { item: '姜片', amount: '3片', icon: '🫚' },
+      { item: '葱段', amount: '2根', icon: '🌿' },
+      { item: '生抽', amount: '2勺', icon: '🫗' },
+      { item: '老抽', amount: '半勺', icon: '🫗' },
+      { item: '料酒', amount: '1勺', icon: '🍶' },
+    ],
+    steps: [
+      { caption: '鸡翅洗净两面各划两刀便于入味，冷水下锅加姜片料酒焯水两分钟。', voice: '鸡翅洗净两面划刀，加姜料酒冷水焯水两分钟。' },
+      { caption: '捞出鸡翅用温水冲洗干净，沥干水分锁住肉汁让口感更嫩。', voice: '捞出鸡翅温水冲洗干净，沥干水分锁住肉汁。' },
+      { caption: '平底锅小火煎鸡翅至两面金黄，不需要额外加油，让鸡皮自然出油。', voice: '平底锅小火煎鸡翅至两面金黄，鸡皮自身出油更香。' },
+      { caption: '加入姜片葱段炒香，倒入一整罐可乐，汤汁要基本没过鸡翅。', voice: '加姜葱炒香，倒入可乐让汤汁基本没过鸡翅。' },
+      { caption: '淋入生抽和老抽调色调味，大火烧开后转中小火慢炖十五分钟。', voice: '加生抽老抽调味调色，大火烧开转中小火炖十五分钟。' },
+      { caption: '开大火收汁至浓稠发亮，让每一只鸡翅都裹上诱人的焦糖色酱汁。', voice: '大火收汁至浓稠发亮，每只鸡翅裹满诱人焦糖色。' },
+    ],
+  },
+  '葱油拌面': {
+    subtitle: '葱香四溢 · 简单温暖',
+    ingredients: [
+      { item: '细面条', amount: '200g', icon: '🍜' },
+      { item: '小葱', amount: '6根', icon: '🌿' },
+      { item: '食用油', amount: '80ml', icon: '🫒' },
+      { item: '生抽', amount: '3勺', icon: '🫗' },
+      { item: '老抽', amount: '1勺', icon: '🫗' },
+      { item: '白糖', amount: '1勺', icon: '🍬' },
+      { item: '白芝麻', amount: '少许', icon: '🌾' },
+    ],
+    steps: [
+      { caption: '小葱洗净切段，葱白葱绿分开，葱白难炸需要先下锅。', voice: '小葱切段，葱白葱绿分开，葱白先下锅，葱绿最后放。' },
+      { caption: '冷锅冷油下葱白，小火慢慢熬至微黄，让葱香充分释放到油中。', voice: '冷锅冷油下葱白，小火慢熬至微黄，葱香完全释放。' },
+      { caption: '加入葱绿继续小火熬约十分钟，直到葱变成深褐色的葱油酥。', voice: '加葱绿继续小火熬十分钟，变成深褐色的葱油酥。' },
+      { caption: '同时调酱汁：生抽、老抽、白糖混合搅拌均匀，调出咸甜平衡的味道。', voice: '同时调酱汁：生抽老抽白糖混合均匀，调出咸甜平衡的味道。' },
+      { caption: '另起一锅开水煮面条，煮至八分熟捞出，过一下温水保持Q弹。', voice: '开水煮面至八分熟，捞出过温水，保持面条Q弹口感。' },
+      { caption: '碗底放两勺熬好的葱油和酱汁，放入面条撒上白芝麻，趁热拌匀开吃。', voice: '碗底放葱油酱汁，下面条撒白芝麻，趁热拌匀香气扑鼻。' },
+    ],
+  },
+};
+
+/* ==================== GENERIC RECIPE GENERATOR ==================== */
+function generateGenericRecipe(topic, style) {
+  const styleTitles = { home: '家庭私房', pro: '大师级', street: '正宗', dessert: '手工', asian: '风味', western: '经典' };
+  const baseIngredients = [
+    { item: '主料', amount: '适量', icon: '🍳' },
+    { item: '葱姜蒜', amount: '适量', icon: '🧄' },
+    { item: '食用油', amount: '2勺', icon: '🫒' },
+    { item: '盐', amount: '少许', icon: '🧂' },
+    { item: '调味料', amount: '适量', icon: '🌶' },
+    { item: '香菜或葱花', amount: '装饰用', icon: '🌿' },
+  ];
+  const stepTemplates = [
+    { caption: `${topic}清洗干净，改刀切成合适大小。食材预处理是美味的第一步。`, voice: `${topic}清洗干净改刀，食材预处理是美味的第一步。` },
+    { caption: '准备好所有调味料和辅料，葱姜切丝，蒜切末，放在一旁备用。', voice: '准备好所有调味料，葱姜切丝蒜切末，放在一旁备用。' },
+    { caption: '热锅冷油，油温上来后先下入不容易熟的部分，大火翻炒出香。', voice: '热锅冷油，先下入不容易熟的部分，大火翻炒出香。' },
+    { caption: '加入剩余食材继续翻炒，均匀受热，让食材的本味慢慢释放出来。', voice: '加入剩余食材继续翻炒，均匀受热让本味自然释放。' },
+    { caption: '根据口味调入适量盐和调味料，翻炒均匀让每一份食材都吸满汤汁。', voice: '调味翻炒均匀，让每一份食材都吸满鲜美的汤汁。' },
+    { caption: `大火收汁至浓稠，撒上葱花或香菜点缀，一份${topic}就完成了，趁热享用吧！`, voice: `大火收汁撒上点缀，${topic}完成，趁热享用吧。` },
+  ];
+  return { title: topic, subtitle: `${styleTitles[style] || ''} ${topic}`, ingredients: baseIngredients, steps: stepTemplates };
+}
+
+function smartMatchRecipe(topic) {
+  const keys = Object.keys(recipeTemplates);
+  for (const key of keys) {
+    if (topic.includes(key) || key.includes(topic)) {
+      return { ...recipeTemplates[key], title: topic || key };
+    }
+  }
+  return null;
+}
+
+/* ==================== AUDIO ENGINE (Web Audio API) ==================== */
+let audioCtx = null;
+
+function initAudio() {
+  if (audioCtx) return;
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  } catch (e) {
+    audioCtx = null;
+  }
+}
+
+function playNote(freq, duration, type = 'sine', volume = 0.15, startDelay = 0) {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(0, audioCtx.currentTime + startDelay);
+  gain.gain.linearRampToValueAtTime(volume, audioCtx.currentTime + startDelay + 0.05);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + startDelay + duration);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start(audioCtx.currentTime + startDelay);
+  osc.stop(audioCtx.currentTime + startDelay + duration);
+}
+
+/* 转场音效：轻快的上升音阶 */
+function playTransitionSound() {
+  if (!audioCtx) return;
+  const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
+  notes.forEach((n, i) => playNote(n, 0.2, 'sine', 0.1, i * 0.08));
+}
+
+/* 步骤开始音效：柔和的提示音 */
+function playStepSound() {
+  if (!audioCtx) return;
+  playNote(880, 0.15, 'sine', 0.08);
+  setTimeout(() => playNote(1046.5, 0.2, 'sine', 0.06), 100);
+}
+
+/* 完成音效：愉快的和弦 */
+function playCompleteSound() {
+  if (!audioCtx) return;
+  const chord = [523.25, 659.25, 783.99, 1046.5]; // C major
+  chord.forEach((n, i) => playNote(n, 0.6, 'sine', 0.06, i * 0.1));
+}
+
+/* 背景环境音：温暖的下厨氛围（用噪声模拟） */
+let bgNoiseNode = null;
+let bgGainNode = null;
+
+function startAmbientSound() {
+  if (!audioCtx || bgNoiseNode) return;
+  try {
+    const bufferSize = 2 * audioCtx.sampleRate;
+    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
+    bgNoiseNode = audioCtx.createBufferSource();
+    bgNoiseNode.buffer = noiseBuffer;
+    bgNoiseNode.loop = true;
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 400;
+    bgGainNode = audioCtx.createGain();
+    bgGainNode.gain.value = 0.03;
+    bgNoiseNode.connect(filter);
+    filter.connect(bgGainNode);
+    bgGainNode.connect(audioCtx.destination);
+    bgNoiseNode.start();
+  } catch (e) { /* silent fail */ }
+}
+
+function stopAmbientSound() {
+  if (bgNoiseNode) {
+    try { bgNoiseNode.stop(); } catch (e) {}
+    bgNoiseNode = null;
+  }
+}
+
+/* 文字转语音（用于预览时的朗读） */
+function speak(text) {
+  if (!state.options.voice) return;
+  if (!('speechSynthesis' in window)) return;
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'zh-CN';
+  utter.rate = 1.1;
+  utter.pitch = 1;
+  utter.volume = 0.8;
+  speechSynthesis.speak(utter);
+}
+
+/* ==================== UI HELPERS ==================== */
+const $ = id => document.getElementById(id);
+const q = (sel, root = document) => root.querySelector(sel);
+const qa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+function showToast(msg, duration = 1800) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => t.classList.remove('show'), duration);
+}
+
+function switchScreen(id) {
+  qa('.screen').forEach(s => s.classList.remove('active'));
+  $(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function showLoading(text) {
+  if (text) $('loading-text').textContent = text;
+  $('loading').style.display = 'flex';
+}
+function hideLoading() { $('loading').style.display = 'none'; }
+
+/* ==================== INIT TOPIC SCREEN ==================== */
+function initTopicScreen() {
+  $('topic-input').addEventListener('input', e => { state.topic = e.target.value.trim(); });
+  qa('#style-chips .chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      qa('#style-chips .chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      state.style = chip.dataset.style;
+    });
+  });
+  qa('#duration-chips .chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      qa('#duration-chips .chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      state.duration = parseInt(chip.dataset.duration, 10);
+    });
+  });
+  $('opt-voice').addEventListener('change', e => state.options.voice = e.target.checked);
+  $('opt-captions').addEventListener('change', e => state.options.captions = e.target.checked);
+  $('opt-ingredients').addEventListener('change', e => state.options.ingredients = e.target.checked);
+  $('opt-kenburns').addEventListener('change', e => state.options.kenburns = e.target.checked);
+  $('btn-generate').addEventListener('click', () => {
+    const topic = state.topic.trim();
+    if (!topic) { showToast('请先输入菜品名称～'); $('topic-input').focus(); return; }
+    initAudio();
+    generateRecipe();
+  });
+}
+
+/* ==================== RECIPE GENERATION ==================== */
+function generateRecipe() {
+  showLoading('🍳 AI正在构思食谱...');
+  setTimeout(() => {
+    const matched = smartMatchRecipe(state.topic);
+    const generic = generateGenericRecipe(state.topic, state.style);
+    state.recipe = matched
+      ? { ...matched, title: state.topic, subtitle: matched.subtitle }
+      : generic;
+
+    /* 为每个步骤分配真实食物图片 URL */
+    const imgLib = foodImages[state.recipe.title] || genericStepImages;
+    state.recipe.steps = state.recipe.steps.map((s, i) => ({
+      ...s,
+      imageUrl: imgLib[i % imgLib.length],
+      image: null, /* 用户上传的图片优先 */
+    }));
+
+    hideLoading();
+    renderEditScreen();
+    switchScreen('screen-edit');
+    showToast('食谱已生成！可上传自己的实拍图片让视频更真实');
+  }, 700);
+}
+
+/* ==================== EDIT SCREEN ==================== */
+function renderEditScreen() {
+  $('recipe-title').value = state.recipe.title || '';
+  $('recipe-subtitle').value = state.recipe.subtitle || '';
+  renderIngredients();
+  renderSteps();
+  updateMeta();
+
+  $('recipe-title').oninput = e => { state.recipe.title = e.target.value; };
+  $('recipe-subtitle').oninput = e => { state.recipe.subtitle = e.target.value; };
+
+  $('btn-add-ingredient').onclick = () => {
+    state.recipe.ingredients.push({ item: '新食材', amount: '适量', icon: '🍳' });
+    renderIngredients(); updateMeta();
+  };
+
+  $('btn-add-step').onclick = () => {
+    const newImg = genericStepImages[state.recipe.steps.length % genericStepImages.length];
+    state.recipe.steps.push({ caption: '描述这一步...', voice: '描述这一步...', image: null, imageUrl: newImg });
+    renderSteps(); updateMeta();
+  };
+
+  $('btn-ai-refresh').onclick = () => {
+    if (!confirm('确定要重新生成吗？当前编辑内容将被替换。')) return;
+    generateRecipe();
+  };
+
+  $('back-topic').onclick = () => switchScreen('screen-topic');
+  $('btn-preview').onclick = () => prepareAndGoRender();
+  $('btn-to-render').onclick = () => prepareAndGoRender();
+}
+
+function renderIngredients() {
+  const container = $('ingredients-list');
+  container.innerHTML = '';
+  state.recipe.ingredients.forEach((ing, idx) => {
+    const row = document.createElement('div');
+    row.className = 'ingredient-item';
+    row.innerHTML = `
+      <div class="ing-icon">${ing.icon || '🍳'}</div>
+      <input type="text" value="${ing.item.replace(/"/g, '&quot;')}" />
+      <input type="text" class="ing-amount" value="${ing.amount.replace(/"/g, '&quot;')}" />
+      <button class="remove-btn">×</button>`;
+    const inputs = row.querySelectorAll('input');
+    inputs[0].oninput = e => { state.recipe.ingredients[idx].item = e.target.value; };
+    inputs[1].oninput = e => { state.recipe.ingredients[idx].amount = e.target.value; };
+    row.querySelector('.remove-btn').onclick = () => {
+      state.recipe.ingredients.splice(idx, 1);
+      renderIngredients(); updateMeta();
+    };
+    container.appendChild(row);
+  });
+}
+
+function renderSteps() {
+  const container = $('steps-container');
+  container.innerHTML = '';
+  state.recipe.steps.forEach((step, idx) => {
+    const card = document.createElement('div');
+    card.className = 'step-card';
+    const hasImage = step.image && step.image.data;
+    const imgTag = hasImage
+      ? `<img src="${step.image.data}" alt="步骤${idx + 1}" />`
+      : `<div class="step-image-placeholder"><img src="${step.imageUrl}" alt="推荐图片" class="suggested-img" onerror="this.style.display='none'" /><div class="overlay-hint"><div class="icon">📷</div><div>点击上传实拍图<br/>可替换为推荐图</div></div></div>`;
+
+    card.innerHTML = `
+      <div class="step-number">${idx + 1}</div>
+      <div class="step-image-box ${hasImage ? 'has-image' : ''}">
+        ${imgTag}
+      </div>
+      <div class="step-body">
+        <div class="caption-label">步骤说明（字幕）</div>
+        <textarea rows="2" class="step-caption">${step.caption || ''}</textarea>
+        <div class="voice-label">语音解说</div>
+        <textarea rows="1" class="step-voice">${step.voice || ''}</textarea>
+        <div class="step-meta-row">
+          <span>步骤 ${idx + 1} / ${state.recipe.steps.length}</span>
+          <button class="remove-step">删除此步</button>
+        </div>
+      </div>`;
+
+    card.querySelector('.step-image-box').onclick = () => openImageModal(idx);
+    card.querySelector('.step-caption').oninput = e => {
+      state.recipe.steps[idx].caption = e.target.value;
+    };
+    card.querySelector('.step-voice').oninput = e => {
+      state.recipe.steps[idx].voice = e.target.value;
+    };
+    card.querySelector('.remove-step').onclick = () => {
+      if (state.recipe.steps.length <= 1) { showToast('至少保留一个步骤'); return; }
+      state.recipe.steps.splice(idx, 1);
+      renderSteps(); updateMeta();
+    };
+    container.appendChild(card);
+  });
+  updateMeta();
+}
+
+function updateMeta() {
+  const stepCount = state.recipe.steps.length;
+  const ingCount = state.recipe.ingredients.length;
+  const hasImageCount = state.recipe.steps.filter(s => s.image && s.image.data).length;
+  $('meta-steps').textContent = `${stepCount}个步骤`;
+  $('meta-total').textContent = `${ingCount}种食材 · ${hasImageCount > 0 ? `已配${hasImageCount}/${stepCount}张图` : '使用推荐美食图'}`;
+}
+
+/* ==================== IMAGE MODAL ==================== */
+function openImageModal(stepIdx) {
+  state.currentStepImageTarget = stepIdx;
+  const step = state.recipe.steps[stepIdx];
+  const imgPrompt = generateImagePrompt(state.recipe.title, stepIdx, step.caption, state.style);
+  $('ai-prompt').value = imgPrompt;
+  renderPresetPrompts(stepIdx);
+
+  qa('.tab-btn').forEach(btn => {
+    btn.onclick = () => {
+      qa('.tab-btn').forEach(b => b.classList.remove('active'));
+      qa('.tab-pane').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      q(`.tab-pane[data-tab="${btn.dataset.tab}"]`).classList.add('active');
+    };
+  });
+
+  $('upload-area').onclick = () => {
+    const fileInput = $('file-input');
+    fileInput.click();
+    fileInput.onchange = handleFileSelect;
+  };
+
+  $('btn-use-prompt').onclick = () => {
+    const prompt = $('ai-prompt').value.trim();
+    if (!prompt) { showToast('请输入提示词'); return; }
+    navigator.clipboard?.writeText(prompt)
+      .then(() => showToast('提示词已复制，可在AI绘图工具使用'))
+      .catch(() => showToast('复制失败，请手动选择文字'));
+  };
+
+  $('btn-modal-cancel').onclick = closeImageModal;
+  $('image-modal').onclick = e => { if (e.target.id === 'image-modal') closeImageModal(); };
+  $('image-modal').style.display = 'flex';
+}
+
+function closeImageModal() {
+  $('image-modal').style.display = 'none';
+  state.currentStepImageTarget = null;
+}
+
+function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (!file || !file.type.startsWith('image/')) { showToast('请选择图片文件'); return; }
+  const reader = new FileReader();
+  reader.onload = evt => {
+    compressImage(evt.target.result, 720, 1280, 0.85).then(compressed => {
+      const idx = state.currentStepImageTarget;
+      if (idx !== null && state.recipe.steps[idx]) {
+        state.recipe.steps[idx].image = { data: compressed, name: file.name };
+        renderSteps(); closeImageModal();
+        showToast('图片已添加 ✓');
+      }
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderPresetPrompts(stepIdx) {
+  const prompts = [
+    '温暖自然光下的食材特写',
+    '厨师正在料理的手部动作',
+    '锅中食材正在翻炒沸腾',
+    '成品摆盘，精美食欲感',
+    '俯视角度拍摄料理台',
+  ];
+  const cont = $('preset-prompts');
+  cont.innerHTML = '';
+  prompts.forEach(p => {
+    const chip = document.createElement('button');
+    chip.className = 'preset-chip';
+    chip.textContent = p;
+    chip.onclick = () => { $('ai-prompt').value = p + ', ' + generateImagePrompt(state.recipe.title, stepIdx, state.recipe.steps[stepIdx].caption, state.style); };
+    cont.appendChild(chip);
+  });
+}
+
+function compressImage(dataUrl, maxW, maxH, quality) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const aspect = img.width / img.height;
+      let w = maxW, h = maxH;
+      if (aspect > maxW / maxH) h = maxW / aspect;
+      else w = maxH * aspect;
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
+function generateImagePrompt(recipeTitle, stepIndex, stepCaption, style) {
+  const styleKeywords = {
+    home: 'cozy home kitchen, natural daylight, wooden countertop',
+    pro: 'professional food photography studio, dramatic lighting',
+    street: 'street food stall at night, warm neon lights, steam rising',
+    dessert: 'elegant dessert presentation, marble background, soft natural light',
+    asian: 'traditional asian kitchen, bamboo steamer, warm candlelight',
+    western: 'rustic european farmhouse kitchen, morning light through window',
+  };
+  const stepKeywords = [
+    'preparing fresh ingredients, close-up shot',
+    'cutting and chopping, hands in frame',
+    'cooking in a pan, steam rising, motion blur',
+    'stirring and mixing, dynamic action shot',
+    'adding seasoning, ingredients falling',
+    'plating and finishing, final dish presentation',
+  ];
+  return `photorealistic food photography, ${recipeTitle}, step ${stepIndex + 1}, ${stepKeywords[stepIndex % stepKeywords.length]}, ${styleKeywords[style] || styleKeywords.home}, shallow depth of field, 85mm lens, f/1.8, natural colors, warm tones, highly detailed, 4k, professional food styling, no text`;
+}
+
+/* ==================== RENDER SCREEN ==================== */
+function prepareAndGoRender() {
+  if (!state.recipe.title) { showToast('请填写菜品名称'); return; }
+  switchScreen('screen-render');
+  initRenderScreen();
+  showInitialFrame();
+}
+
+/* ---- Scene Building ---- */
+function buildScenes() {
+  const scenes = [];
+  /* Cover */
+  scenes.push({ type: 'cover', duration: 3, title: state.recipe.title, subtitle: state.recipe.subtitle });
+  /* Ingredients */
+  if (state.options.ingredients && state.recipe.ingredients.length > 0) {
+    scenes.push({ type: 'ingredients', duration: Math.max(4, state.recipe.ingredients.length * 0.6), items: state.recipe.ingredients, title: '准备食材' });
+  }
+  /* Steps */
+  const totalSteps = state.recipe.steps.length;
+  const remainingTime = Math.max(10, state.duration - 9);
+  const perStepDuration = remainingTime / totalSteps;
+  state.recipe.steps.forEach((step, idx) => {
+    scenes.push({ type: 'step', duration: perStepDuration, index: idx + 1, total: totalSteps, caption: step.caption, voice: step.voice, image: step.image, imageUrl: step.imageUrl });
+  });
+  /* Ending */
+  scenes.push({ type: 'ending', duration: 3.5, title: state.recipe.title, subtitle: '制作完成 · 开动吧！' });
+  return scenes;
+}
+
+/* ---- Image Cache ---- */
+const imageCache = new Map();
+function loadImage(dataUrl) {
+  if (imageCache.has(dataUrl)) return Promise.resolve(imageCache.get(dataUrl));
+  return new Promise(resolve => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => { imageCache.set(dataUrl, img); resolve(img); };
+    img.onerror = () => resolve(null);
+    img.src = dataUrl;
+  });
+}
+async function preloadAllImages() {
+  const urls = state.recipe.steps.map(s => s.image && s.image.data || s.imageUrl).filter(Boolean);
+  await Promise.all(urls.map(u => loadImage(u)));
+}
+
+/* ---- Canvas Helpers ---- */
+const canvas = () => $('render-canvas');
+const ctx = () => canvas().getContext('2d');
+const CW = 720, CH = 1280;
+
+function clearCanvas() {
+  ctx().clearRect(0, 0, CW, CH);
+}
+
+/* ---- SVG Placeholder (fallback when no images) ---- */
+const svgPlaceholders = {};
+function getSvgPlaceholder(title, stepIndex, accentColor = '#ff6b35') {
+  const key = `${title}-${stepIndex}`;
+  if (svgPlaceholders[key]) return svgPlaceholders[key];
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${CW}' height='${CH}'>
+    <defs>
+      <linearGradient id='bg${key}' x1='0' y1='0' x2='1' y2='1'>
+        <stop offset='0%' stop-color='#2c1810'/>
+        <stop offset='50%' stop-color='#4a2820'/>
+        <stop offset='100%' stop-color='#1a0f08'/>
+      </linearGradient>
+      <radialGradient id='glow${key}' cx='50%' cy='35%' r='60%'>
+        <stop offset='0%' stop-color='rgba(255,150,80,0.3)'/>
+        <stop offset='100%' stop-color='rgba(0,0,0,0)'/>
+      </radialGradient>
+    </defs>
+    <rect width='${CW}' height='${CH}' fill='url(#bg${key})'/>
+    <rect width='${CW}' height='${CH}' fill='url(#glow${key})'/>
+    <circle cx='${CW/2}' cy='${CH*0.38}' r='140' fill='none' stroke='${accentColor}' stroke-width='2' opacity='0.3'/>
+    <circle cx='${CW/2}' cy='${CH*0.38}' r='180' fill='none' stroke='${accentColor}' stroke-width='1' opacity='0.15'/>
+    <text x='${CW/2}' y='${CH*0.38}' font-size='200' text-anchor='middle' dominant-baseline='middle' opacity='0.2'>🍳</text>
+    <text x='${CW/2}' y='${CH*0.72}' font-size='32' fill='${accentColor}' text-anchor='middle' font-family='sans-serif' opacity='0.8'>${title}</text>
+    <text x='${CW/2}' y='${CH*0.78}' font-size='22' fill='rgba(255,200,150,0.6)' text-anchor='middle' font-family='sans-serif'>步骤 ${stepIndex + 1}</text>
+  </svg>`;
+  const blob = new Blob([svg], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(blob);
+  svgPlaceholders[key] = url;
+  return url;
+}
+
+/* ---- Drawing Functions ---- */
+function drawBgDark() {
+  const cx = ctx();
+  const grad = cx.createLinearGradient(0, 0, 0, CH);
+  grad.addColorStop(0, '#1a0f08'); grad.addColorStop(0.5, '#2c1810'); grad.addColorStop(1, '#0d0705');
+  cx.fillStyle = grad; cx.fillRect(0, 0, CW, CH);
+  const radial = cx.createRadialGradient(CW/2, CH*0.35, 0, CW/2, CH*0.35, CW*0.9);
+  radial.addColorStop(0, 'rgba(255,160,80,0.2)'); radial.addColorStop(1, 'rgba(0,0,0,0)');
+  cx.fillStyle = radial; cx.fillRect(0, 0, CW, CH);
+}
+
+function drawVignette(intensity = 0.5) {
+  const cx = ctx();
+  const vig = cx.createRadialGradient(CW/2, CH/2, CW*0.2, CW/2, CH/2, CW*0.85);
+  vig.addColorStop(0, 'rgba(0,0,0,0)'); vig.addColorStop(1, `rgba(0,0,0,${intensity})`);
+  cx.fillStyle = vig; cx.fillRect(0, 0, CW, CH);
+}
+
+function drawFilmGrain(t) {
+  const cx = ctx();
+  cx.save();
+  cx.globalAlpha = 0.04;
+  for (let i = 0; i < 800; i++) {
+    const x = Math.random() * CW, y = Math.random() * CH;
+    const brightness = Math.random() > 0.5 ? 255 : 0;
+    cx.fillStyle = `rgb(${brightness},${brightness},${brightness})`;
+    cx.fillRect(x, y, 1, 1);
+  }
+  cx.restore();
+}
+
+function drawKenBurnsImage(img, t, duration, intensity = 1) {
+  if (!img) return;
+  const cx = ctx();
+  const iw = img.width || CW, ih = img.height || CH;
+  const imgAspect = iw / ih, canvasAspect = CW / CH;
+  const progress = Math.min(t / duration, 1);
+  const zoomStart = 1.0, zoomEnd = state.options.kenburns ? 1.12 : 1.0;
+  const zoom = zoomStart + (zoomEnd - zoomStart) * progress;
+  let dw = CW * zoom, dh = CW * zoom / imgAspect;
+  if (dh < CH * zoom) { dh = CH * zoom; dw = dh * imgAspect; }
+  const sx = (CW - dw) / 2, sy = (CH - dh) / 2;
+  cx.drawImage(img, sx, sy, dw, dh);
+  drawVignette(0.45 * intensity);
+}
+
+function roundRect(cx, x, y, w, h, r) {
+  cx.beginPath();
+  cx.moveTo(x+r, y); cx.lineTo(x+w-r, y);
+  cx.quadraticCurveTo(x+w, y, x+w, y+r);
+  cx.lineTo(x+w, y+h-r); cx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  cx.lineTo(x+r, y+h); cx.quadraticCurveTo(x, y+h, x, y+h-r);
+  cx.lineTo(x, y+r); cx.quadraticCurveTo(x, y, x+r, y);
+  cx.closePath();
+}
+
+function wrapText(text, maxW, fontSize) {
+  const chars = text.split(''); const lines = []; let cur = '';
+  const measure = s => { ctx().font = `600 ${fontSize}px -apple-system,"PingFang SC",sans-serif`; return ctx().measureText(s).width; };
+  for (const ch of chars) {
+    if (ch === '\n') { lines.push(cur); cur = ''; continue; }
+    const test = cur + ch;
+    if (measure(test) > maxW && cur.length > 0) { lines.push(cur); cur = ch; }
+    else cur = test;
+  }
+  if (cur) lines.push(cur);
+  return lines;
+}
+
+function drawWatermark() {
+  const text = state.watermark;
+  if (!text) return;
+  const cx = ctx();
+  cx.save();
+  cx.globalAlpha = 0.55;
+  cx.font = '500 20px -apple-system,"PingFang SC",sans-serif';
+  cx.fillStyle = '#ffffff'; cx.textAlign = 'right'; cx.textBaseline = 'bottom';
+  cx.shadowColor = 'rgba(0,0,0,0.5)'; cx.shadowBlur = 4;
+  cx.fillText(text, CW - 30, CH - 30);
+  cx.restore();
+}
+
+/* ---- Scene Renderers ---- */
+function drawSceneCover(scene, t) {
+  const cx = ctx();
+  clearCanvas();
+  const firstStepImg = state.recipe.steps.find(s => s.image && s.image.data || s.imageUrl);
+  const imgUrl = firstStepImg ? (firstStepImg.image && firstStepImg.image.data || firstStepImg.imageUrl) : null;
+  if (imgUrl) {
+    const img = imageCache.get(imgUrl);
+    if (img) drawKenBurnsImage(img, t, scene.duration);
+    else { drawBgDark(); drawFilmGrain(t); }
+  } else {
+    drawBgDark(); drawFilmGrain(t);
+    /* decorative food icons */
+    cx.save();
+    cx.globalAlpha = 0.08; cx.font = 'bold 400px sans-serif';
+    cx.textAlign = 'center'; cx.textBaseline = 'middle';
+    cx.fillText('🍳', CW/2, CH*0.4);
+    cx.restore();
+  }
+  drawVignette(0.5);
+
+  /* Entrance animation */
+  const fadeIn = Math.min(t / 0.6, 1);
+  const slideUp = Math.min(t / 0.8, 1);
+  const easeOut = 1 - Math.pow(1 - slideUp, 3);
+
+  cx.save();
+  cx.globalAlpha = fadeIn;
+
+  /* top label */
+  cx.font = '500 24px -apple-system,"PingFang SC",sans-serif';
+  cx.fillStyle = '#ffcba8'; cx.textAlign = 'center';
+  cx.fillText('— HOME COOKING —', CW/2, CH * 0.18 - (1 - easeOut) * 30);
+
+  /* title */
+  const titleSize = Math.min(72, (CW - 100) / (scene.title.length * 0.85));
+  cx.font = `800 ${titleSize}px -apple-system,"PingFang SC",sans-serif`;
+  cx.fillStyle = '#ffffff';
+  cx.shadowColor = 'rgba(0,0,0,0.5)'; cx.shadowBlur = 16; cx.shadowOffsetY = 4;
+  cx.fillText(scene.title, CW/2, CH * 0.38 - (1 - easeOut) * 50);
+  cx.shadowBlur = 0; cx.shadowOffsetY = 0;
+
+  /* subtitle */
+  if (scene.subtitle) {
+    cx.font = '500 28px -apple-system,"PingFang SC",sans-serif';
+    cx.fillStyle = '#ffd9b8';
+    cx.fillText(scene.subtitle, CW/2, CH * 0.48 - (1 - easeOut) * 30);
+  }
+
+  /* divider */
+  cx.fillStyle = '#ff6b35';
+  cx.fillRect(CW/2 - 70, CH * 0.56, 140, 4);
+  cx.font = '400 20px -apple-system,"PingFang SC",sans-serif';
+  cx.fillStyle = '#c4a080';
+  cx.fillText('烹饪步骤详解', CW/2, CH * 0.62);
+
+  /* step count badge */
+  if (t > 1) {
+    cx.font = '600 22px -apple-system,"PingFang SC",sans-serif';
+    cx.fillStyle = 'rgba(255,107,53,0.9)';
+    const badgeW = 180, badgeH = 44;
+    roundRect(cx, CW/2 - badgeW/2, CH * 0.70, badgeW, badgeH, 22);
+    cx.fillStyle = 'rgba(255,107,53,0.9)'; cx.fill();
+    cx.fillStyle = '#ffffff'; cx.textAlign = 'center';
+    cx.fillText(`${state.recipe.steps.length} 个步骤完整教学`, CW/2, CH * 0.70 + 28);
+  }
+
+  cx.restore();
+  if (state.options.watermark && state.watermark) drawWatermark();
+}
+
+function drawSceneIngredients(scene, t) {
+  const cx = ctx();
+  clearCanvas();
+  drawBgDark(); drawVignette(0.3);
+
+  const fadeIn = Math.min(t / 0.4, 1);
+  cx.save();
+  cx.globalAlpha = fadeIn;
+
+  /* title */
+  cx.font = '700 42px -apple-system,"PingFang SC",sans-serif';
+  cx.fillStyle = '#ff9558'; cx.textAlign = 'center';
+  cx.fillText('🧺  食材清单  🧺', CW/2, 130);
+
+  /* separator */
+  cx.fillStyle = 'rgba(255,150,80,0.5)';
+  cx.fillRect(CW/2 - 140, 168, 280, 2);
+
+  /* card */
+  const cardPad = 50, cardTop = 200;
+  const cardW = CW - cardPad * 2, cardH = Math.min(750, scene.items.length * 75 + 80);
+  roundRect(cx, cardPad, cardTop, cardW, cardH, 20);
+  cx.fillStyle = 'rgba(255,248,240,0.97)'; cx.fill();
+
+  /* items */
+  scene.items.forEach((ing, idx) => {
+    const y = cardTop + 55 + idx * 72;
+    if (y > cardTop + cardH - 50) return;
+    cx.font = '38px sans-serif'; cx.textAlign = 'left'; cx.textBaseline = 'middle';
+    cx.fillText(ing.icon || '🍳', cardPad + 30, y + 4);
+    cx.font = '600 28px -apple-system,"PingFang SC",sans-serif';
+    cx.fillStyle = '#2c1810'; cx.fillText(ing.item, cardPad + 80, y);
+    cx.font = '500 24px -apple-system,"PingFang SC",sans-serif';
+    cx.fillStyle = '#8b6914'; cx.textAlign = 'right';
+    cx.fillText(ing.amount, CW - cardPad - 30, y);
+    if (idx < scene.items.length - 1) {
+      cx.fillStyle = 'rgba(200,160,100,0.2)';
+      cx.fillRect(cardPad + 30, y + 30, cardW - 60, 1);
+    }
+  });
+
+  cx.restore();
+  if (state.options.watermark && state.watermark) drawWatermark();
+}
+
+function drawSceneStep(scene, t) {
+  const cx = ctx();
+  clearCanvas();
+
+  /* Image layer */
+  const imgUrl = scene.image && scene.image.data || scene.imageUrl;
+  if (imgUrl) {
+    const img = imageCache.get(imgUrl);
+    if (img) {
+      drawKenBurnsImage(img, t, scene.duration);
+    } else {
+      /* Try loading the image */
+      loadImage(imgUrl).then(loadedImg => {
+        if (loadedImg) renderScene(scene, t);
+      });
+      drawBgDark();
+    }
+  } else {
+    drawBgDark();
+  }
+  drawFilmGrain(t);
+  drawVignette(0.5);
+
+  /* Step badge */
+  const badgeR = 50, badgeX = 80, badgeY = 130;
+  cx.save();
+  cx.shadowColor = 'rgba(0,0,0,0.5)'; cx.shadowBlur = 20; cx.shadowOffsetY = 6;
+  cx.beginPath(); cx.arc(badgeX, badgeY, badgeR, 0, Math.PI * 2);
+  const badgeGrad = cx.createLinearGradient(0, badgeY - badgeR, 0, badgeY + badgeR);
+  badgeGrad.addColorStop(0, '#ff9558'); badgeGrad.addColorStop(1, '#e85a24');
+  cx.fillStyle = badgeGrad; cx.fill();
+  cx.shadowBlur = 0; cx.shadowOffsetY = 0;
+  cx.font = '800 46px -apple-system,"PingFang SC",sans-serif';
+  cx.fillStyle = '#ffffff'; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+  cx.fillText(`${scene.index}`, badgeX, badgeY - 4);
+  cx.font = '600 20px -apple-system,"PingFang SC",sans-serif';
+  cx.fillText(`/${scene.total}`, badgeX + 36, badgeY + 24);
+
+  /* Step label */
+  cx.font = '700 36px -apple-system,"PingFang SC",sans-serif';
+  cx.fillStyle = '#ffffff'; cx.textAlign = 'left';
+  cx.shadowColor = 'rgba(0,0,0,0.6)'; cx.shadowBlur = 8;
+  cx.fillText(`步骤 ${scene.index}`, badgeX + badgeR + 20, badgeY - 2);
+  cx.shadowBlur = 0;
+  cx.restore();
+
+  /* Caption card */
+  if (state.options.captions && scene.caption) {
+    const cardH = 300, cardY = CH - cardH - 30, cardX = 30, cardW = CW - 60;
+    cx.save();
+
+    /* card background */
+    roundRect(cx, cardX, cardY, cardW, cardH, 20);
+    const cardGrad = cx.createLinearGradient(0, cardY, 0, cardY + cardH);
+    cardGrad.addColorStop(0, 'rgba(255,252,248,0.96)');
+    cardGrad.addColorStop(1, 'rgba(255,240,228,0.96)');
+    cx.fillStyle = cardGrad; cx.fill();
+
+    /* top accent */
+    roundRect(cx, cardX, cardY, cardW, 6, 3);
+    cx.fillStyle = '#ff6b35'; cx.fill();
+
+    /* karaoke caption effect */
+    const voiceText = scene.voice || scene.caption;
+    const charDuration = scene.duration * 0.7 / voiceText.length;
+    const charsRevealed = Math.min(Math.floor(t / charDuration), voiceText.length);
+    const revealedText = voiceText.substring(0, charsRevealed);
+    const remainingText = voiceText.substring(charsRevealed);
+
+    cx.font = `600 30px -apple-system,"PingFang SC",sans-serif`;
+    const lines = wrapText(scene.caption, cardW - 60, 30);
+    const lineH = 44;
+    const totalH = lines.length * lineH;
+    const startY = cardY + cardH / 2 - totalH / 2 + lineH / 2;
+
+    cx.textAlign = 'center'; cx.textBaseline = 'middle';
+
+    if (charsRevealed < voiceText.length && t < scene.duration * 0.8) {
+      /* karaoke style: revealed in orange, remaining in gray */
+      const firstLineLen = lines[0] ? lines[0].length : 0;
+      const revealedInFirstLine = Math.min(charsRevealed, firstLineLen);
+      if (lines[0]) {
+        /* revealed part */
+        cx.fillStyle = '#ff6b35';
+        cx.fillText(lines[0].substring(0, revealedInFirstLine), CW/2, startY);
+        /* remaining part */
+        if (revealedInFirstLine < lines[0].length) {
+          cx.fillStyle = '#c4a080';
+          cx.fillText(lines[0].substring(revealedInFirstLine), CW/2 + cx.measureText(lines[0].substring(0, revealedInFirstLine)).width/2, startY);
+        }
+        /* remaining lines */
+        for (let i = 1; i < lines.length; i++) {
+          const revealedInLine = Math.max(0, charsRevealed - firstLineLen - lines.slice(1, i).join('').length);
+          const totalLineChars = lines[i].length;
+          const rev = Math.min(revealedInLine, totalLineChars);
+          cx.fillStyle = '#ff6b35';
+          cx.fillText(lines[i].substring(0, rev), CW/2, startY + i * lineH);
+          if (rev < totalLineChars) {
+            cx.fillStyle = '#c4a080';
+            cx.fillText(lines[i].substring(rev), CW/2 + cx.measureText(lines[i].substring(0, rev)).width/2, startY + i * lineH);
+          }
+        }
+      }
+    } else {
+      /* fully revealed */
+      lines.slice(0, 5).forEach((line, i) => {
+        cx.fillStyle = '#2c1810';
+        cx.fillText(line, CW/2, startY + i * lineH);
+      });
+    }
+
+    cx.restore();
+  }
+
+  /* step progress bar */
+  const progress = Math.min(t / scene.duration, 1);
+  cx.save();
+  cx.fillStyle = 'rgba(255,255,255,0.2)';
+  cx.fillRect(30, CH - 16, CW - 60, 4);
+  cx.fillStyle = '#ff6b35';
+  cx.fillRect(30, CH - 16, (CW - 60) * progress, 4);
+  cx.restore();
+
+  if (state.options.watermark && state.watermark) drawWatermark();
+}
+
+function drawSceneEnding(scene, t) {
+  const cx = ctx();
+  clearCanvas();
+
+  const lastStepImg = [...state.recipe.steps].reverse().find(s => s.image && s.image.data || s.imageUrl);
+  const imgUrl = lastStepImg ? (lastStepImg.image && lastStepImg.image.data || lastStepImg.imageUrl) : null;
+  if (imgUrl) {
+    const img = imageCache.get(imgUrl);
+    if (img) {
+      drawKenBurnsImage(img, t, scene.duration);
+      /* dark overlay for text readability */
+      cx.fillStyle = 'rgba(0,0,0,0.35)';
+      cx.fillRect(0, CH * 0.25, CW, CH * 0.5);
+    } else { drawBgDark(); }
+  } else { drawBgDark(); }
+
+  drawFilmGrain(t);
+  drawVignette(0.6);
+
+  const fadeIn = Math.min(t / 0.6, 1);
+  const bounce = Math.sin(t * 2.5) * 12;
+
+  cx.save();
+  cx.globalAlpha = fadeIn;
+
+  /* emoji with bounce */
+  cx.font = 'bold 260px sans-serif';
+  cx.textAlign = 'center'; cx.textBaseline = 'middle';
+  cx.globalAlpha = fadeIn * 0.6;
+  cx.fillText('🍽', CW/2, CH * 0.35 + bounce);
+  cx.globalAlpha = fadeIn;
+
+  /* title */
+  cx.font = '800 60px -apple-system,"PingFang SC",sans-serif';
+  cx.fillStyle = '#ffffff';
+  cx.shadowColor = 'rgba(0,0,0,0.6)'; cx.shadowBlur = 20; cx.shadowOffsetY = 4;
+  cx.fillText(scene.title, CW/2, CH * 0.55);
+  cx.shadowBlur = 0; cx.shadowOffsetY = 0;
+
+  /* subtitle */
+  cx.font = '500 30px -apple-system,"PingFang SC",sans-serif';
+  cx.fillStyle = '#ffcba8';
+  cx.fillText('✦ ' + (scene.subtitle || '制作完成') + ' ✦', CW/2, CH * 0.64);
+
+  /* stars */
+  for (let i = 0; i < 6; i++) {
+    const angle = (t * 0.4 + i * 1.05) % (Math.PI * 2);
+    const r = 250;
+    const sx = CW/2 + Math.cos(angle) * r;
+    const sy = CH * 0.45 + Math.sin(angle) * r * 0.35;
+    cx.font = '28px sans-serif';
+    cx.fillStyle = `rgba(255,200,100,${0.3 + Math.sin(t * 2 + i) * 0.2})`;
+    cx.fillText('✦', sx, sy);
+  }
+
+  cx.restore();
+  if (state.options.watermark && state.watermark) drawWatermark();
+}
+
+/* ---- Main Render ---- */
+function renderScene(scene, t) {
+  ctx().clearRect(0, 0, CW, CH);
+  switch (scene.type) {
+    case 'cover': drawSceneCover(scene, t); break;
+    case 'ingredients': drawSceneIngredients(scene, t); break;
+    case 'step': drawSceneStep(scene, t); break;
+    case 'ending': drawSceneEnding(scene, t); break;
+  }
+}
+
+/* ==================== PREVIEW + EXPORT ==================== */
+function showInitialFrame() {
+  const scenes = buildScenes();
+  preloadAllImages().then(() => renderScene(scenes[0], 0));
+}
+
+let animationFrame = null;
+let recorder = null;
+let recordedChunks = [];
+let isExporting = false;
+
+function initRenderScreen() {
+  $('back-edit').onclick = () => { if (animationFrame) cancelAnimationFrame(animationFrame); switchScreen('screen-edit'); };
+  $('btn-back-edit-hide').onclick = () => { if (animationFrame) cancelAnimationFrame(animationFrame); switchScreen('screen-edit'); };
+  $('btn-play').onclick = () => { if (animationFrame) cancelAnimationFrame(animationFrame); playPreview(); };
+  $('btn-export').onclick = () => { if (animationFrame) cancelAnimationFrame(animationFrame); exportVideo(); };
+  $('opt-watermark').addEventListener('change', e => state.options.watermark = e.target.checked);
+  $('watermark-text').addEventListener('input', e => state.watermark = e.target.value.trim());
+}
+
+async function playPreview() {
+  initAudio();
+  const scenes = buildScenes();
+  await preloadAllImages();
+  $('preview-overlay').classList.add('hidden');
+  stopAmbientSound();
+
+  let sceneIdx = 0, sceneTime = 0, lastTime = performance.now();
+  let narrationPlayed = false;
+
+  /* start ambient sound */
+  startAmbientSound();
+
+  function loop(now) {
+    const dt = (now - lastTime) / 1000;
+    lastTime = now;
+    sceneTime += dt;
+
+    if (sceneTime >= scenes[sceneIdx].duration) {
+      /* transition sound */
+      playTransitionSound();
+      sceneTime = 0;
+      sceneIdx++;
+      narrationPlayed = false;
+      if (sceneIdx >= scenes.length) {
+        stopAmbientSound();
+        animationFrame = null;
+        return;
+      }
+    }
+
+    /* trigger narration for steps */
+    const sc = scenes[sceneIdx];
+    if (sc.type === 'step' && !narrationPlayed && sceneTime > 0.3) {
+      narrationPlayed = true;
+      speak(sc.voice || sc.caption);
+      if (sc.type === 'step') playStepSound();
+    }
+    if (sc.type === 'cover' && !narrationPlayed && sceneTime > 1) { narrationPlayed = true; speak(`${sc.title}，${sc.subtitle}`); }
+    if (sc.type === 'ending' && !narrationPlayed && sceneTime > 0.5) { narrationPlayed = true; playCompleteSound(); speak('完成！开动吧！'); }
+
+    renderScene(scenes[sceneIdx], sceneTime);
+    animationFrame = requestAnimationFrame(loop);
+  }
+
+  animationFrame = requestAnimationFrame(loop);
+}
+
+async function exportVideo() {
+  if (isExporting) return;
+  isExporting = true;
+  if (animationFrame) { cancelAnimationFrame(animationFrame); animationFrame = null; }
+
+  const scenes = buildScenes();
+  await preloadAllImages();
+
+  /* detect best mime type */
+  const candidates = [
+    'video/webm;codecs=vp9',
+    'video/webm;codecs=vp8',
+    'video/webm',
+  ];
+  let mediaType = '';
+  for (const t of candidates) {
+    if (window.MediaRecorder && MediaRecorder.isTypeSupported(t)) { mediaType = t; break; }
+  }
+  if (!window.MediaRecorder || !mediaType) {
+    showToast('当前浏览器不支持视频录制，建议使用Chrome');
+    isExporting = false; return;
+  }
+
+  const c = canvas();
+  const stream = c.captureStream(30);
+  recordedChunks = [];
+  try {
+    recorder = new MediaRecorder(stream, { mimeType: mediaType, videoBitsPerSecond: 5_000_000 });
+  } catch (e) {
+    recorder = new MediaRecorder(stream, { mimeType: mediaType });
+  }
+  recorder.ondataavailable = e => { if (e.data && e.data.size > 0) recordedChunks.push(e.data); };
+
+  recorder.onstop = () => {
+    const blob = new Blob(recordedChunks, { type: mediaType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `${(state.recipe.title || 'recipe').replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_')}_美食视频.webm`; a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); isExporting = false; }, 1000);
+    hideLoading();
+    showToast('✅ 视频已生成并下载！');
+  };
+
+  showLoading('🎬 正在合成视频...');
+  $('progress-bar').style.display = 'block';
+  $('progress-fill').style.width = '0%';
+  $('progress-label').style.display = 'block';
+  $('preview-overlay').classList.add('hidden');
+
+  recorder.start(100);
+
+  const fps = 30, frameTime = 1 / fps;
+  let sceneIdx = 0, sceneTime = 0, totalTime = 0;
+  const totalDuration = scenes.reduce((s, sc) => s + sc.duration, 0);
+  let soundPlayed = {};
+
+  function nextFrame() {
+    renderScene(scenes[sceneIdx], sceneTime);
+
+    /* play sounds on scene start */
+    const sc = scenes[sceneIdx];
+    const sceneKey = `${sceneIdx}-start`;
+    if (!soundPlayed[sceneKey] && sceneTime < 0.1) {
+      soundPlayed[sceneKey] = true;
+      if (sc.type === 'step') playStepSound();
+      if (sc.type === 'ending') playCompleteSound();
+    }
+    const stepKey = `${sceneIdx}-trans`;
+    if (sceneTime >= scenes[sceneIdx].duration - 0.05 && !soundPlayed[stepKey]) {
+      soundPlayed[stepKey] = true;
+      playTransitionSound();
+    }
+
+    sceneTime += frameTime;
+    totalTime += frameTime;
+    const progress = Math.min(totalTime / totalDuration, 1);
+    $('progress-fill').style.width = `${Math.floor(progress * 100)}%`;
+    $('progress-label').textContent = `生成中 ${Math.floor(progress * 100)}%`;
+
+    if (sceneTime >= scenes[sceneIdx].duration) {
+      sceneTime = 0; sceneIdx++;
+      if (sceneIdx >= scenes.length) {
+        setTimeout(() => {
+          recorder.stop();
+          $('progress-bar').style.display = 'none';
+          $('progress-label').style.display = 'none';
+        }, 100);
+        return;
+      }
+    }
+    setTimeout(nextFrame, Math.max(1, frameTime * 1000 * 0.7));
+  }
+
+  nextFrame();
+}
+
+/* ==================== INIT ==================== */
+function init() {
+  initTopicScreen();
+  $('topic-input').value = '番茄炒蛋';
+  state.topic = '番茄炒蛋';
+}
+document.addEventListener('DOMContentLoaded', init);

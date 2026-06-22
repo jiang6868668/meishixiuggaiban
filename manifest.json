@@ -1,0 +1,44 @@
+{
+  "name": "美食视频工坊 · Recipe Video Studio",
+  "short_name": "美食视频",
+  "description": "根据主题自动生成美食烹饪步骤视频，支持手机端使用，一键生成菜谱脚本并导出竖版短视频。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#faf8f5",
+  "theme_color": "#ff6b35",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "categories": ["food", "lifestyle", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "番茄炒蛋",
+      "short_name": "番茄炒蛋",
+      "description": "快速生成番茄炒蛋视频",
+      "url": "./?recipe=%E7%95%AA%E8%8C%84%E7%82%92%E8%9B%8B",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "红烧肉",
+      "short_name": "红烧肉",
+      "description": "快速生成红烧肉视频",
+      "url": "./?recipe=%E7%BA%A2%E7%83%A7%E8%82%89",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
