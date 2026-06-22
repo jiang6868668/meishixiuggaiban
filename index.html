@@ -1,88 +1,21 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#ff6b35"><title>🍳 美食工坊 · 一键生成烹饪视频</title><style>*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",Helvetica,Arial,sans-serif;background:linear-gradient(180deg,#fff8f0 0%,#fff 50%);min-height:100vh;color:#2c1810;padding:16px;font-size:14px;line-height:1.55}.logo{font-size:34px;text-align:center;margin:10px 0 6px}.title{text-align:center;font-size:20px;font-weight:700;color:#ff6b35;margin-bottom:4px}.subtitle{text-align:center;color:#8a6a50;font-size:12px;margin-bottom:20px}.card{background:#fff;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 2px 12px rgba(255,107,53,0.1);border:1px solid #ffe8d6}.label{font-weight:600;font-size:13px;color:#5a3820;margin-bottom:10px;display:flex;align-items:center;gap:6px}.chip{display:inline-block;padding:8px 12px;margin:4px 6px 4px 0;background:#fff3e8;border:1.5px solid #ffd4b3;border-radius:20px;font-size:13px;color:#d85a1f;cursor:pointer;transition:all .15s;white-space:nowrap}.chip:active{transform:scale(.95)}.chip.selected{background:#ff6b35;color:#fff;border-color:#ff6b35;box-shadow:0 4px 10px rgba(255,107,53,.35)}.input{width:100%;padding:12px 14px;border:1.5px solid #ffd4b3;border-radius:10px;font-size:15px;color:#2c1810;background:#fffaf5;outline:none;font-family:inherit}.input:focus{border-color:#ff6b35;background:#fff}.btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#ff6b35,#e85a24);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(255,107,53,.35);transition:transform .15s;margin-top:4px}.btn:active{transform:scale(.98)}.btn-ghost{background:#fff;color:#ff6b35;border:1.5px solid #ff6b35;box-shadow:none}.btn-ghost:active{background:#fff3e8}.check{display:flex;align-items:center;padding:8px 0;gap:10px;cursor:pointer}.check input{width:18px;height:18px;accent-color:#ff6b35}.check span{font-size:14px;color:#5a3820}.section-title{font-size:15px;font-weight:700;color:#ff6b35;margin:4px 0 10px;display:flex;align-items:center;gap:6px}.step-item{background:#fffaf5;border:1px solid #ffe0c7;border-radius:10px;padding:10px 12px;margin-bottom:8px}.step-title{font-weight:600;color:#d85a1f;font-size:14px;margin-bottom:4px}.step-text{font-size:13px;color:#5a3820;line-height:1.6}.recipe-name{font-size:18px;font-weight:700;color:#2c1810;text-align:center;margin-bottom:8px}.recipe-desc{font-size:13px;color:#8a6a50;text-align:center;margin-bottom:14px;font-style:italic}.ingredients{background:linear-gradient(135deg,#fff8f0,#fff3e8);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:13px;color:#5a3820}.ingredient-item{padding:4px 0;border-bottom:1px dashed #ffd4b3}.ingredient-item:last-child{border-bottom:none}.step-number{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#ff6b35;color:#fff;border-radius:50%;font-size:12px;font-weight:700;margin-right:6px}.preview-box{background:#1a1a1a;border-radius:12px;padding:10px;margin-bottom:12px;text-align:center}.preview-box canvas{width:100%;max-width:360px;border-radius:8px;background:#2c1810}.video-info{color:#666;font-size:12px;margin-top:8px}.hint{background:#fff3e8;border-left:3px solid #ff6b35;padding:10px 12px;border-radius:6px;font-size:12px;color:#8a5a30;margin:10px 0}.spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;margin-right:8px;vertical-align:middle}@keyframes spin{to{transform:rotate(360deg)}}.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#2c1810;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.2);opacity:0;transition:opacity .3s}.toast.show{opacity:1}.tag{display:inline-block;padding:2px 8px;background:#fff3e8;color:#d85a1f;border-radius:10px;font-size:11px;margin-right:4px}.footer{text-align:center;color:#aa8a70;font-size:11px;padding:20px 0 10px}.big{font-size:17px}</style></head><body><div class="logo">🍳</div><div class="title">美食工坊</div><div class="subtitle">输入主题 · 自动生成菜谱 · 一键合成烹饪视频</div><div id="view-setup" class="card"><div class="label">🍲 想做什么菜？</div><input class="input" id="theme-input" placeholder="例如：番茄炒蛋、红烧肉、提拉米苏、葱油拌面..." value="番茄炒蛋"><div style="margin-top:14px"><div class="label">⏱ 视频时长</div><div id="duration-chips"><div class="chip selected" data-val="15">15秒</div><div class="chip" data-val="30">30秒</div><div class="chip" data-val="60">60秒</div></div></div><div style="margin-top:10px"><div class="label">✨ 选项</div><label class="check"><input type="checkbox" id="opt-subtitles" checked><span>添加文字字幕</span></label><label class="check"><input type="checkbox" id="opt-watermark" checked><span>添加水印 / 账号</span></label><label class="check"><input type="checkbox" id="opt-kenburns" checked><span>镜头缓慢推进效果</span></label></div><button class="btn" id="btn-generate" style="margin-top:16px">✨ 生成菜谱与视频</button></div><div id="view-recipe" style="display:none" class="card"><div class="recipe-name" id="recipe-name">番茄炒蛋</div><div class="recipe-desc" id="recipe-desc">家常经典 · 简单美味</div><div class="ingredients" id="recipe-ingredients"></div><div id="recipe-steps"></div><button class="btn" id="btn-video" style="margin-top:8px">🎥 合成视频</button><button class="btn btn-ghost" id="btn-back1" style="margin-top:8px">← 返回修改</button></div><div id="view-video" style="display:none" class="card"><div class="recipe-name" id="video-title">正在生成...</div><div class="preview-box"><canvas id="preview-canvas" width="720" height="1280"></canvas><div class="video-info" id="video-info">准备中... 请稍候</div></div><button class="btn" id="btn-download" style="display:none;margin-top:8px">⬇ 下载视频 (WebM)</button><button class="btn btn-ghost" id="btn-back2" style="margin-top:8px">← 重新生成</button><div class="hint">💡 提示：下载后可用手机自带相册/文件管理查看，或通过微信/抖音发布</div></div><div class="footer">🍳 美食工坊 · 纯本地浏览器生成 · 不上传任何内容</div><div class="toast" id="toast"></div><script>
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#ff6b35"><title>🍳 美食工坊 · 一键生成烹饪视频</title><style>*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",Helvetica,Arial,sans-serif;background:linear-gradient(180deg,#fff8f0 0%,#fff 50%);min-height:100vh;color:#2c1810;padding:16px;font-size:14px;line-height:1.55}.logo{font-size:34px;text-align:center;margin:10px 0 6px}.title{text-align:center;font-size:20px;font-weight:700;color:#ff6b35;margin-bottom:4px}.subtitle{text-align:center;color:#8a6a50;font-size:12px;margin-bottom:20px}.card{background:#fff;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 2px 12px rgba(255,107,53,0.1);border:1px solid #ffe8d6}.label{font-weight:600;font-size:13px;color:#5a3820;margin-bottom:10px;display:flex;align-items:center;gap:6px}.chip{display:inline-block;padding:8px 12px;margin:4px 6px 4px 0;background:#fff3e8;border:1.5px solid #ffd4b3;border-radius:20px;font-size:13px;color:#d85a1f;cursor:pointer;transition:all .15s;white-space:nowrap}.chip:active{transform:scale(.95)}.chip.selected{background:#ff6b35;color:#fff;border-color:#ff6b35;box-shadow:0 4px 10px rgba(255,107,53,.35)}.input{width:100%;padding:12px 14px;border:1.5px solid #ffd4b3;border-radius:10px;font-size:15px;color:#2c1810;background:#fffaf5;outline:none;font-family:inherit}.input:focus{border-color:#ff6b35;background:#fff}.btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#ff6b35,#e85a24);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(255,107,53,.35);transition:transform .15s;margin-top:4px}.btn:active{transform:scale(.98)}.btn-ghost{background:#fff;color:#ff6b35;border:1.5px solid #ff6b35;box-shadow:none}.btn-ghost:active{background:#fff3e8}.check{display:flex;align-items:center;padding:8px 0;gap:10px;cursor:pointer}.check input{width:18px;height:18px;accent-color:#ff6b35}.check span{font-size:14px;color:#5a3820}.section-title{font-size:15px;font-weight:700;color:#ff6b35;margin:4px 0 10px;display:flex;align-items:center;gap:6px}.step-item{background:#fffaf5;border:1px solid #ffe0c7;border-radius:10px;padding:10px 12px;margin-bottom:8px}.step-title{font-weight:600;color:#d85a1f;font-size:14px;margin-bottom:4px}.step-text{font-size:13px;color:#5a3820;line-height:1.6}.recipe-name{font-size:18px;font-weight:700;color:#2c1810;text-align:center;margin-bottom:8px}.recipe-desc{font-size:13px;color:#8a6a50;text-align:center;margin-bottom:14px;font-style:italic}.ingredients{background:linear-gradient(135deg,#fff8f0,#fff3e8);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:13px;color:#5a3820}.ingredient-item{padding:4px 0;border-bottom:1px dashed #ffd4b3}.ingredient-item:last-child{border-bottom:none}.step-number{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#ff6b35;color:#fff;border-radius:50%;font-size:12px;font-weight:700;margin-right:6px}.preview-box{background:#1a1a1a;border-radius:12px;padding:10px;margin-bottom:12px;text-align:center}.preview-box canvas{width:100%;max-width:360px;border-radius:8px;background:#2c1810}.video-info{color:#666;font-size:12px;margin-top:8px}.hint{background:#fff3e8;border-left:3px solid #ff6b35;padding:10px 12px;border-radius:6px;font-size:12px;color:#8a5a30;margin:10px 0}.spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;margin-right:8px;vertical-align:middle}@keyframes spin{to{transform:rotate(360deg)}}.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#2c1810;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.2);opacity:0;transition:opacity .3s}.toast.show{opacity:1}.tag{display:inline-block;padding:2px 8px;background:#fff3e8;color:#d85a1f;border-radius:10px;font-size:11px;margin-right:4px}.footer{text-align:center;color:#aa8a70;font-size:11px;padding:20px 0 10px}.big{font-size:17px}</style></head><body><div class="logo">🍳</div><div class="title">美食工坊</div><div class="subtitle">输入主题 · 自动生成菜谱 · 一键合成烹饪视频</div><div id="view-setup" class="card"><div class="label">🍲 想做什么菜？</div><input class="input" id="theme-input" placeholder="例如：番茄炒蛋、红烧肉、提拉米苏、葱油拌面..." value="番茄炒蛋"><div style="margin-top:14px"><div class="label">⏱ 视频时长</div><div id="duration-chips"><div class="chip selected" data-val="15">15秒</div><div class="chip" data-val="30">30秒</div><div class="chip" data-val="60">60秒</div></div></div><div style="margin-top:10px"><div class="label">✨ 选项</div><label class="check"><input type="checkbox" id="opt-subtitles" checked><span>添加文字字幕</span></label><label class="check"><input type="checkbox" id="opt-watermark" checked><span>添加水印 / 账号</span></label><label class="check"><input type="checkbox" id="opt-kenburns" checked><span>镜头缓慢推进效果</span></label><div style="margin-top:12px"><div class="label">🔑 OpenAI API Key（DALL-E 图片生成）</div><input class="input" id="api-key-input" type="password" placeholder="sk-...（从 openai.com 获取，$5起充）" style="font-size:13px"></input><div class="hint" style="margin-top:6px">💡 需要 OpenAI API Key 才能使用 AI 图片生成功能。<a href="https://platform.openai.com/api-keys" target="_blank" style="color:#ff6b35">点击获取 API Key</a>（$5 起充，用多少扣多少）</div></div></div><button class="btn" id="btn-generate" style="margin-top:16px">✨ 生成菜谱与视频</button></div><div id="view-recipe" style="display:none" class="card"><div class="recipe-name" id="recipe-name">番茄炒蛋</div><div class="recipe-desc" id="recipe-desc">家常经典 · 简单美味</div><div class="ingredients" id="recipe-ingredients"></div><div id="recipe-steps"></div><div id="ai-section" style="display:none;background:#fffaf5;border:1px solid #ffd4b3;border-radius:10px;padding:12px;margin-bottom:10px"><div class="label">🎨 AI 智能图片生成</div><div id="gen-status" style="font-size:13px;color:#8a6a50;margin-bottom:10px;min-height:20px">准备好生成了，可以开始 AI 图片生成</div><button class="btn" id="btn-ai-generate" style="background:linear-gradient(135deg,#9b59b6,#8e44ad)">🎨 AI 生成步骤图片</button><div class="hint" style="margin-top:8px">💡 点击后 AI 会根据每个步骤内容生成对应的真实图片，让视频更生动。每个步骤约 10-20 秒，请耐心等待。</div></div><button class="btn" id="btn-video" style="margin-top:8px">🎥 合成视频</button><button class="btn btn-ghost" id="btn-back1" style="margin-top:8px">← 返回修改</button></div><div id="view-video" style="display:none" class="card"><div class="recipe-name" id="video-title">正在生成...</div><div class="preview-box"><canvas id="preview-canvas" width="720" height="1280"></canvas><div class="video-info" id="video-info">准备中... 请稍候</div></div><button class="btn" id="btn-download" style="display:none;margin-top:8px">⬇ 下载视频 (WebM)</button><button class="btn btn-ghost" id="btn-back2" style="margin-top:8px">← 重新生成</button><div class="hint">💡 提示：下载后可用手机自带相册/文件管理查看，或通过微信/抖音发布</div></div><div class="footer">🍳 美食工坊 · 纯本地浏览器生成 · 不上传任何内容</div><div class="toast" id="toast"></div><script>
 /* ========================================================
-   🍳 美食视频工坊 Pro · Recipe Video Studio v2.1
-   适配旧版界面 + 真实图片 + 音效 + 语音 + Ken Burns
+   🍳 美食视频工坊 Pro v3.0
+   OpenAI DALL-E AI 图片生成 + 音效 + 语音 + Ken Burns
    ======================================================== */
 
 /* ==================== STATE ==================== */
 const state = {
   theme: '番茄炒蛋',
-  duration: 15,
+  duration: 30,
   subtitles: true,
   watermark: true,
   kenburns: true,
   recipe: null,
-  videoBlob: null,
+  stepImages: [],    // AI 生成的每步图片
+  apiKey: '',        // 用户输入的 OpenAI API Key
+  isGenerating: false,
 };
-
-/* ==================== FOOD IMAGES LIBRARY ==================== */
-const foodImages = {
-  '番茄炒蛋': [
-    'https://loremflickr.com/720/1280/tomato-eggs?random=1',
-    'https://loremflickr.com/720/1280/tomatoes?random=2',
-    'https://loremflickr.com/720/1280/frying-eggs?random=3',
-    'https://loremflickr.com/720/1280/chinese-eggs?random=4',
-    'https://loremflickr.com/720/1280/tomato-cooking?random=5',
-    'https://loremflickr.com/720/1280/stir-fry?random=6',
-  ],
-  '红烧肉': [
-    'https://loremflickr.com/720/1280/braised-pork?random=20',
-    'https://loremflickr.com/720/1280/pork-belly?random=21',
-    'https://loremflickr.com/720/1280/chinese-pork?random=22',
-    'https://loremflickr.com/720/1280/meat-cooking?random=23',
-    'https://loremflickr.com/720/1280/red-pork?random=24',
-    'https://loremflickr.com/720/1280/pork-dish?random=25',
-  ],
-  '提拉米苏': [
-    'https://loremflickr.com/720/1280/tiramisu?random=30',
-    'https://loremflickr.com/720/1280/dessert?random=31',
-    'https://loremflickr.com/720/1280/coffee-dessert?random=32',
-    'https://loremflickr.com/720/1280/italian-dessert?random=33',
-    'https://loremflickr.com/720/1280/cream-cake?random=34',
-    'https://loremflickr.com/720/1280/cake-slice?random=35',
-  ],
-  '蛋炒饭': [
-    'https://loremflickr.com/720/1280/fried-rice?random=10',
-    'https://loremflickr.com/720/1280/egg-rice?random=11',
-    'https://loremflickr.com/720/1280/rice-bowl?random=12',
-    'https://loremflickr.com/720/1280/chinese-rice?random=13',
-    'https://loremflickr.com/720/1280/stir-fry-rice?random=14',
-    'https://loremflickr.com/720/1280/yellow-rice?random=15',
-  ],
-  '麻婆豆腐': [
-    'https://loremflickr.com/720/1280/mapo-tofu?random=40',
-    'https://loremflickr.com/720/1280/tofu?random=41',
-    'https://loremflickr.com/720/1280/spicy-tofu?random=42',
-    'https://loremflickr.com/720/1280/chinese-tofu?random=43',
-    'https://loremflickr.com/720/1280/sichuan-food?random=44',
-    'https://loremflickr.com/720/1280/red-tofu?random=45',
-  ],
-  '可乐鸡翅': [
-    'https://loremflickr.com/720/1280/chicken-wings?random=50',
-    'https://loremflickr.com/720/1280/braised-chicken?random=51',
-    'https://loremflickr.com/720/1280/chicken-dish?random=52',
-    'https://loremflickr.com/720/1280/sweet-chicken?random=53',
-    'https://loremflickr.com/720/1280/chinese-chicken?random=54',
-    'https://loremflickr.com/720/1280/wing-cooking?random=55',
-  ],
-  '葱油拌面': [
-    'https://loremflickr.com/720/1280/noodles?random=60',
-    'https://loremflickr.com/720/1280/chinese-noodles?random=61',
-    'https://loremflickr.com/720/1280/oil-noodles?random=62',
-    'https://loremflickr.com/720/1280/noodle-bowl?random=63',
-    'https://loremflickr.com/720/1280/shanghai-food?random=64',
-    'https://loremflickr.com/720/1280/plain-noodles?random=65',
-  ],
-};
-
-const genericStepImages = [
-  'https://loremflickr.com/720/1280/cooking?random=100',
-  'https://loremflickr.com/720/1280/kitchen?random=101',
-  'https://loremflickr.com/720/1280/food-prep?random=102',
-  'https://loremflickr.com/720/1280/chopping?random=103',
-  'https://loremflickr.com/720/1280/stove?random=104',
-  'https://loremflickr.com/720/1280/pan?random=105',
-];
 
 /* ==================== RECIPE DATABASE ==================== */
 const RECIPES = {
@@ -90,43 +23,97 @@ const RECIPES = {
     emoji: '🍅',
     desc: '家常经典 · 简单美味',
     ingredients: [{n:'鸡蛋',q:'3个'}, {n:'番茄',q:'2个'}, {n:'葱花',q:'适量'}, {n:'盐',q:'少许'}, {n:'糖',q:'1勺'}, {n:'食用油',q:'2勺'}],
-    steps: ['番茄2个洗净切小块，鸡蛋3个打散加少许盐', '热锅冷油，油温六成热倒入蛋液', '中火快速翻炒至八成熟盛出备用', '锅内留底油，下番茄块翻炒2分钟出汁', '加1勺糖、少许盐调味，继续翻炒至番茄软烂', '倒入炒好的鸡蛋翻炒均匀，撒葱花出锅装盘']
+    steps: [
+      '番茄2个洗净切小块，鸡蛋3个打散加少许盐',
+      '热锅冷油，油温六成热倒入蛋液',
+      '中火快速翻炒至八成熟盛出备用',
+      '锅内留底油，下番茄块翻炒2分钟出汁',
+      '加1勺糖、少许盐调味，继续翻炒至番茄软烂',
+      '倒入炒好的鸡蛋翻炒均匀，撒葱花出锅装盘'
+    ]
   },
   红烧肉: {
     emoji: '🥘',
     desc: '浓香入味 · 节日硬菜',
     ingredients: [{n:'五花肉',q:'500g'}, {n:'冰糖',q:'30g'}, {n:'生抽',q:'2勺'}, {n:'老抽',q:'1勺'}, {n:'料酒',q:'2勺'}, {n:'姜葱',q:'适量'}, {n:'八角桂皮',q:'少许'}],
-    steps: ['五花肉500g切3cm方块冷水下锅焯水，加姜片料酒去腥', '大火煮开后捞出用温水洗净沥干', '锅中加少许油和30g冰糖，小火慢慢炒糖色', '炒至琥珀色冒小泡立即倒入五花肉快速翻炒上色', '加2勺生抽、1勺老抽、2勺料酒翻炒均匀', '加入没过肉的开水，放葱段姜片八角桂皮', '大火烧开后转小火炖45分钟，最后大火收汁即可出锅']
+    steps: [
+      '五花肉500g切3cm方块冷水下锅焯水，加姜片料酒去腥',
+      '大火煮开后捞出用温水洗净沥干',
+      '锅中加少许油和30g冰糖，小火慢慢炒糖色',
+      '炒至琥珀色冒小泡立即倒入五花肉快速翻炒上色',
+      '加2勺生抽、1勺老抽、2勺料酒翻炒均匀',
+      '加入没过肉的开水，放葱段姜片八角桂皮',
+      '大火烧开后转小火炖45分钟，最后大火收汁即可出锅'
+    ]
   },
   提拉米苏: {
     emoji: '🍰',
     desc: '经典意式甜点 · 无需烤箱',
     ingredients: [{n:'马斯卡彭奶酪',q:'250g'}, {n:'手指饼干',q:'200g'}, {n:'浓缩咖啡',q:'200ml'}, {n:'鸡蛋',q:'3个'}, {n:'细砂糖',q:'50g'}, {n:'可可粉',q:'适量'}],
-    steps: ['蛋黄3个加50g糖隔水加热打发至浓稠发白', '加入250g马斯卡彭奶酪搅拌均匀顺滑', '蛋白3个打发至硬性发泡，分两次拌入奶酪糊', '手指饼干快速蘸取冷却的浓缩咖啡，铺一层在容器底部', '铺一层奶酪糊，再铺一层蘸咖啡的饼干，重复两次', '表面用刮刀抹平，放入冰箱冷藏4小时以上', '食用前筛上厚厚一层可可粉装饰']
+    steps: [
+      '蛋黄3个加50g糖隔水加热打发至浓稠发白',
+      '加入250g马斯卡彭奶酪搅拌均匀顺滑',
+      '蛋白3个打发至硬性发泡，分两次拌入奶酪糊',
+      '手指饼干快速蘸取冷却的浓缩咖啡，铺一层在容器底部',
+      '铺一层奶酪糊，再铺一层蘸咖啡的饼干，重复两次',
+      '表面用刮刀抹平，放入冰箱冷藏4小时以上',
+      '食用前筛上厚厚一层可可粉装饰'
+    ]
   },
   蛋炒饭: {
     emoji: '🍚',
     desc: '粒粒分明 · 金黄诱人',
     ingredients: [{n:'隔夜米饭',q:'2碗'}, {n:'鸡蛋',q:'2个'}, {n:'葱花',q:'2勺'}, {n:'盐',q:'少许'}, {n:'生抽',q:'1勺'}, {n:'食用油',q:'2勺'}],
-    steps: ['米饭提前用手打散粒粒分明，鸡蛋2个打散', '热锅倒入油，油温七成热倒入蛋液', '蛋液刚凝固立即倒入米饭快速翻炒', '用铲子快速翻炒让米饭裹上蛋液', '加1勺生抽、少许盐调味，大火翻炒1分钟', '最后撒入葱花翻匀出锅装盘']
+    steps: [
+      '米饭提前用手打散粒粒分明，鸡蛋2个打散',
+      '热锅倒入油，油温七成热倒入蛋液',
+      '蛋液刚凝固立即倒入米饭快速翻炒',
+      '用铲子快速翻炒让米饭裹上蛋液',
+      '加1勺生抽、少许盐调味，大火翻炒1分钟',
+      '最后撒入葱花翻匀出锅装盘'
+    ]
   },
   麻婆豆腐: {
     emoji: '🌶',
     desc: '麻辣鲜香 · 川菜经典',
     ingredients: [{n:'嫩豆腐',q:'1盒'}, {n:'牛肉末',q:'100g'}, {n:'豆瓣酱',q:'2勺'}, {n:'花椒粉',q:'1勺'}, {n:'蒜末',q:'1勺'}, {n:'葱花',q:'适量'}, {n:'水淀粉',q:'适量'}],
-    steps: ['嫩豆腐切2cm方块，加盐水浸泡10分钟去豆腥', '热锅下油，倒入牛肉末煸炒至变色出香', '加2勺豆瓣酱和蒜末炒出红油', '加入适量清水煮开，放入豆腐块轻轻推动', '加生抽调味，小火煮3分钟让豆腐入味', '分两次淋入水淀粉勾芡，让汤汁浓稠', '撒上花椒粉和葱花出锅，麻辣鲜香']
+    steps: [
+      '嫩豆腐切2cm方块，加盐水浸泡10分钟去豆腥',
+      '热锅下油，倒入牛肉末煸炒至变色出香',
+      '加2勺豆瓣酱和蒜末炒出红油',
+      '加入适量清水煮开，放入豆腐块轻轻推动',
+      '加生抽调味，小火煮3分钟让豆腐入味',
+      '分两次淋入水淀粉勾芡，让汤汁浓稠',
+      '撒上花椒粉和葱花出锅，麻辣鲜香'
+    ]
   },
   可乐鸡翅: {
     emoji: '🥤',
     desc: '甜香浓郁 · 孩子最爱',
     ingredients: [{n:'鸡翅中',q:'500g'}, {n:'可乐',q:'1罐(330ml)'}, {n:'生抽',q:'2勺'}, {n:'老抽',q:'1勺'}, {n:'料酒',q:'1勺'}, {n:'姜片',q:'3片'}],
-    steps: ['鸡翅中洗净两面划2-3刀便于入味', '冷水下锅加姜片和料酒焯水，煮开后捞出洗净', '热锅加少许油，将鸡翅皮朝下煎至金黄', '翻面继续煎至两面金黄', '倒入整罐可乐没过鸡翅，加2勺生抽1勺老抽', '大火煮开后转中火炖15分钟', '最后大火收汁至浓稠挂在鸡翅上即可']
+    steps: [
+      '鸡翅中洗净两面划2-3刀便于入味',
+      '冷水下锅加姜片和料酒焯水，煮开后捞出洗净',
+      '热锅加少许油，将鸡翅皮朝下煎至金黄',
+      '翻面继续煎至两面金黄',
+      '倒入整罐可乐没过鸡翅，加2勺生抽1勺老抽',
+      '大火煮开后转中火炖15分钟',
+      '最后大火收汁至浓稠挂在鸡翅上即可'
+    ]
   },
   葱油拌面: {
     emoji: '🍜',
     desc: '葱油飘香 · 上海风味',
     ingredients: [{n:'细面',q:'200g'}, {n:'小葱',q:'1大把'}, {n:'食用油',q:'4勺'}, {n:'生抽',q:'2勺'}, {n:'老抽',q:'1勺'}, {n:'糖',q:'1勺'}],
-    steps: ['小葱洗净切段，葱白葱绿分开', '冷锅冷油下葱白小火慢慢煸香', '葱白变金黄后加入葱绿继续小火慢熬', '熬至葱绿深褐葱香四溢，过滤出葱油备用', '碗中加2勺生抽、1勺老抽、1勺糖、2勺葱油调匀', '锅中烧开水煮面条至熟，捞出沥干水分', '将面条倒入调好的酱汁中拌匀，香气扑鼻开吃']
+    steps: [
+      '小葱洗净切段，葱白葱绿分开',
+      '冷锅冷油下葱白小火慢慢煸香',
+      '葱白变金黄后加入葱绿继续小火慢熬',
+      '熬至葱绿深褐葱香四溢，过滤出葱油备用',
+      '碗中加2勺生抽、1勺老抽、1勺糖、2勺葱油调匀',
+      '锅中烧开水煮面条至熟，捞出沥干水分',
+      '将面条倒入调好的酱汁中拌匀，香气扑鼻开吃'
+    ]
   }
 };
 
@@ -157,24 +144,27 @@ function playNote(freq, duration, type = 'sine', volume = 0.15) {
 }
 
 function playTransitionSound() {
-  // C5 -> E5 -> G5 上升音阶
   playNote(523.25, 0.2, 'sine', 0.1);
   setTimeout(() => playNote(659.25, 0.2, 'sine', 0.08), 80);
   setTimeout(() => playNote(783.99, 0.25, 'sine', 0.06), 160);
 }
 
 function playStepSound() {
-  // 柔和提示音
   playNote(880, 0.15, 'sine', 0.08);
   setTimeout(() => playNote(1046.5, 0.2, 'sine', 0.06), 100);
 }
 
 function playCompleteSound() {
-  // C major 和弦
   playNote(523.25, 0.6, 'sine', 0.06);
   setTimeout(() => playNote(659.25, 0.6, 'sine', 0.05), 100);
   setTimeout(() => playNote(783.99, 0.6, 'sine', 0.04), 200);
   setTimeout(() => playNote(1046.5, 0.7, 'sine', 0.03), 300);
+}
+
+function playAISound() {
+  playNote(440, 0.1, 'sine', 0.1);
+  setTimeout(() => playNote(554, 0.1, 'sine', 0.1), 100);
+  setTimeout(() => playNote(659, 0.15, 'sine', 0.1), 200);
 }
 
 /* ==================== SPEECH ==================== */
@@ -192,33 +182,85 @@ function speak(text) {
 const imageCache = new Map();
 
 function loadImage(url) {
-  if (imageCache.has(url)) {
-    return Promise.resolve(imageCache.get(url));
-  }
   return new Promise((resolve, reject) => {
+    if (imageCache.has(url)) {
+      resolve(imageCache.get(url));
+      return;
+    }
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => {
       imageCache.set(url, img);
       resolve(img);
     };
-    img.onerror = () => {
-      // 失败时用备用图
-      resolve(null);
-    };
+    img.onerror = () => resolve(null);
     img.src = url;
   });
+}
+
+/* ==================== DALL-E IMAGE GENERATION ==================== */
+async function generateImageWithDALL-E(apiKey, prompt, stepNum) {
+  updateGenStatus(`🎨 AI 正在生成步骤${stepNum}的图片...`);
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/images/generations', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'dall-e-3',
+        prompt: prompt,
+        n: 1,
+        size: '1024x1024',
+        style: 'natural'
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error?.message || 'API 请求失败');
+    }
+
+    const data = await response.json();
+    const imageUrl = data.data[0].url;
+
+    // 下载图片到本地（解决跨域问题）
+    updateGenStatus(`📥 下载 AI 图片...`);
+    const img = await loadImageFromURL(imageUrl);
+    return img;
+  } catch (e) {
+    console.error('DALL-E 生成失败:', e);
+    return null;
+  }
+}
+
+async function loadImageFromURL(url) {
+  const response = await fetch(url);
+  const blob = await response.blob();
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error('图片加载失败'));
+    img.src = URL.createObjectURL(blob);
+  });
+}
+
+function buildDALLEPrompt(recipeTitle, stepText, stepNum) {
+  return `Food photography, ${recipeTitle}, cooking step ${stepNum}: ${stepText}, professional food blog photo, warm kitchen lighting, top-down view, shallow depth of field, 4K quality, appetizing, real food, not illustrations or cartoons`;
 }
 
 /* ==================== UI HELPERS ==================== */
 const $ = s => document.querySelector(s);
 function showToast(m) {
   const t = $('#toast');
-  if (t) {
-    t.textContent = m;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 1800);
-  }
+  if (t) { t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
+}
+
+function updateGenStatus(m) {
+  const el = $('#gen-status');
+  if (el) el.textContent = m;
 }
 
 /* ==================== CHIP SELECTOR ==================== */
@@ -238,26 +280,19 @@ $('#btn-generate').onclick = () => {
   state.subtitles = $('#opt-subtitles')?.checked ?? true;
   state.watermark = $('#opt-watermark')?.checked ?? true;
   state.kenburns = $('#opt-kenburns')?.checked ?? true;
+  state.stepImages = [];
 
-  // 初始化音频
   initAudio();
+  playTransitionSound();
 
   let r = RECIPES[t];
   if (!r) {
     const keys = Object.keys(RECIPES);
     r = RECIPES[keys[Math.floor(Math.random() * keys.length)]];
-    showToast(`"${t}"暂无内置菜谱，已为你推荐`);
+    showToast(`"${t}"暂无内置菜谱，已推荐`);
   }
   state.recipe = JSON.parse(JSON.stringify(r));
 
-  // 为每个步骤分配图片
-  const imgLib = foodImages[t] || genericStepImages;
-  state.recipe.steps = state.recipe.steps.map((s, i) => ({
-    text: s,
-    imageUrl: imgLib[i % imgLib.length]
-  }));
-
-  // 渲染菜谱
   $('#recipe-name').textContent = t + ' ' + r.emoji;
   $('#recipe-desc').textContent = r.desc;
   const ing = r.ingredients.map(i => `<div class="ingredient-item">• ${i.n} ${i.q}</div>`).join('');
@@ -267,9 +302,60 @@ $('#btn-generate').onclick = () => {
 
   $('#view-setup').style.display = 'none';
   $('#view-recipe').style.display = 'block';
-  window.scrollTo(0, 0);
 
-  playTransitionSound();
+  // 显示 AI 图片生成区域
+  $('#ai-section').style.display = 'block';
+  $('#gen-status').textContent = '准备好生成了，可以开始 AI 图片生成';
+  $('#btn-ai-generate').disabled = false;
+  $('#btn-video').disabled = true;
+
+  window.scrollTo(0, 0);
+};
+
+/* ==================== AI GENERATE IMAGES ==================== */
+$('#btn-ai-generate').onclick = async () => {
+  const apiKey = $('#api-key-input').value.trim();
+  if (!apiKey) {
+    showToast('请先输入 OpenAI API Key');
+    $('#api-key-input').focus();
+    return;
+  }
+
+  state.apiKey = apiKey;
+  state.isGenerating = true;
+  $('#btn-ai-generate').disabled = true;
+  $('#btn-video').disabled = true;
+  playAISound();
+
+  state.stepImages = [];
+  const steps = state.recipe.steps;
+
+  updateGenStatus('🎨 开始 AI 生成图片，请稍候...');
+
+  for (let i = 0; i < steps.length; i++) {
+    updateGenStatus(`🎨 AI 生成步骤${i+1}/${steps.length}...`);
+
+    const prompt = buildDALLEPrompt(state.theme, steps[i], i + 1);
+    const img = await generateImageWithDALL_E(apiKey, prompt, i + 1);
+
+    if (img) {
+      state.stepImages[i] = img;
+      updateGenStatus(`✅ 步骤${i+1} 完成 (${i+1}/${steps.length})`);
+    } else {
+      updateGenStatus(`⚠️ 步骤${i+1} 失败，使用默认图`);
+      // 失败时用灰色占位
+      state.stepImages[i] = null;
+    }
+
+    playStepSound();
+  }
+
+  state.isGenerating = false;
+  $('#btn-video').disabled = false;
+  $('#btn-ai-generate').disabled = false;
+  updateGenStatus('✅ 全部图片生成完成！可以合成视频了');
+  playCompleteSound();
+  showToast('AI 图片生成完成！');
 };
 
 /* ==================== BACK BUTTONS ==================== */
@@ -295,18 +381,10 @@ $('#btn-video').onclick = async () => {
   const canvas = $('#preview-canvas');
   const ctx = canvas.getContext('2d');
   const info = $('#video-info');
-  info.textContent = '⏳ 正在加载图片...';
+  info.textContent = '⏳ 正在准备视频...';
 
-  // 预加载所有图片
-  const urls = state.recipe.steps.map(s => s.imageUrl);
-  const images = await Promise.all(urls.map(u => loadImage(u)));
-  info.textContent = '⏳ 正在生成视频...';
-
-  // 初始化音频
   initAudio();
-  playStepSound();
 
-  // MediaRecorder
   let mediaRecorder, chunks = [];
   const stream = canvas.captureStream(30);
   try {
@@ -315,7 +393,7 @@ $('#btn-video').onclick = async () => {
     try {
       mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
     } catch (e2) {
-      info.textContent = '❌ 你的浏览器不支持视频录制';
+      info.textContent = '❌ 你的浏览器不支持视频录制（建议使用 Chrome）';
       return;
     }
   }
@@ -342,99 +420,115 @@ $('#btn-video').onclick = async () => {
   const totalMs = state.duration * 1000;
   const steps = state.recipe.steps;
   const n = steps.length;
-  const coverMs = Math.max(2000, totalMs * 0.15);
-  const ingMs = state.recipe.ingredients.length > 4 ? Math.max(2000, totalMs * 0.1) : 0;
+  const coverMs = Math.max(2000, totalMs * 0.12);
+  const ingMs = state.recipe.ingredients.length > 4 ? Math.max(1500, totalMs * 0.08) : 0;
   const stepMs = (totalMs - coverMs - ingMs - 2000) / n;
   const endMs = 2000;
 
   // 绘制函数
   function drawCover(progress) {
-    ctx.fillStyle = '#2c1810';
+    ctx.fillStyle = '#1a0a05';
     ctx.fillRect(0, 0, W, H);
 
-    // Ken Burns 效果
     const zoom = 1 + progress * 0.1;
     ctx.save();
     ctx.translate(W/2, H/2);
     ctx.scale(zoom, zoom);
     ctx.translate(-W/2, -H/2);
 
-    // 渐变背景
-    const grd = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, H);
-    grd.addColorStop(0, '#ff6b35');
-    grd.addColorStop(1, '#2c1810');
+    const grd = ctx.createRadialGradient(W/2, H*0.4, 0, W/2, H*0.4, H*0.8);
+    grd.addColorStop(0, 'rgba(255,107,53,0.9)');
+    grd.addColorStop(0.5, 'rgba(200,60,20,0.8)');
+    grd.addColorStop(1, 'rgba(30,10,5,0.95)');
     ctx.fillStyle = grd;
     ctx.fillRect(0, 0, W, H);
     ctx.restore();
 
-    // 暗角
-    drawVignette(0.4);
+    // 装饰线
+    ctx.strokeStyle = 'rgba(255,200,150,0.2)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 5; i++) {
+      ctx.beginPath();
+      ctx.moveTo(0, H * 0.2 + i * 30);
+      ctx.lineTo(W, H * 0.2 + i * 30);
+      ctx.stroke();
+    }
 
-    // 标题
-    ctx.font = 'bold 68px sans-serif';
+    ctx.font = 'bold 72px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillStyle = '#fff';
-    ctx.fillText(state.recipe.emoji, W/2, H/2 - 120);
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = 20;
+    ctx.fillText(state.recipe.emoji, W/2, H/2 - 140);
+    ctx.shadowBlur = 0;
 
-    ctx.font = 'bold 52px sans-serif';
-    ctx.fillStyle = '#ff6b35';
+    ctx.font = 'bold 48px sans-serif';
+    ctx.fillStyle = '#fff';
     const title = state.theme.length > 8 ? state.theme.substring(0, 8) : state.theme;
-    ctx.fillText(title, W/2, H/2 - 10);
+    ctx.fillText(title, W/2, H/2 - 20);
 
-    ctx.font = '24px sans-serif';
-    ctx.fillStyle = '#d4a590';
-    ctx.fillText(state.recipe.desc, W/2, H/2 + 50);
+    ctx.font = '26px sans-serif';
+    ctx.fillStyle = 'rgba(255,220,180,0.9)';
+    ctx.fillText(state.recipe.desc, W/2, H/2 + 40);
 
     ctx.font = '20px sans-serif';
-    ctx.fillStyle = '#aa8a70';
-    ctx.fillText(`✦ ${steps.length} 步快手教程 ✦`, W/2, H/2 + 110);
+    ctx.fillStyle = 'rgba(255,200,150,0.7)';
+    ctx.fillText(`✦ ${steps.length} 步快手教程 ✦`, W/2, H/2 + 100);
 
     drawWatermark();
   }
 
-  function drawIngredients(progress) {
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(40, 40, W-80, H-80);
+  function drawIngredients() {
+    ctx.fillStyle = '#fef9f4';
+    ctx.fillRect(30, 30, W-60, H-60);
 
-    ctx.font = 'bold 38px sans-serif';
+    // 顶部装饰
+    ctx.fillStyle = '#ff6b35';
+    ctx.fillRect(30, 30, W-60, 6);
+
+    ctx.font = 'bold 42px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillStyle = '#ff6b35';
-    ctx.fillText('🥗 所需食材', W/2, 110);
+    ctx.fillText('🥗 所需食材', W/2, 95);
 
     ctx.font = '22px sans-serif';
     ctx.fillStyle = '#8a6a50';
-    ctx.fillText('准备好这些食材，我们开始吧', W/2, 145);
+    ctx.fillText('准备好这些食材，我们开始吧', W/2, 130);
 
-    let y = 210;
+    let y = 190;
     ctx.textAlign = 'left';
     state.recipe.ingredients.forEach((ing, i) => {
       ctx.fillStyle = i % 2 === 0 ? '#fff8f0' : '#fff3e8';
-      ctx.fillRect(80, y-30, W-160, 50);
-      ctx.font = 'bold 22px sans-serif';
+      ctx.fillRect(60, y-35, W-120, 55);
+      ctx.font = 'bold 24px sans-serif';
       ctx.fillStyle = '#d85a1f';
-      ctx.fillText((i+1) + '.', 100, y+5);
-      ctx.font = '22px sans-serif';
-      ctx.fillStyle = '#5a3820';
-      ctx.fillText(ing.n, 140, y+5);
+      ctx.fillText(`${i+1}.`, 80, y+5);
+      ctx.font = '24px sans-serif';
+      ctx.fillStyle = '#3a2010';
+      ctx.fillText(ing.n, 120, y+5);
       ctx.textAlign = 'right';
       ctx.font = '20px sans-serif';
       ctx.fillStyle = '#8a6a50';
-      ctx.fillText(ing.q, W-100, y+5);
+      ctx.fillText(ing.q, W-80, y+5);
       ctx.textAlign = 'left';
       y += 65;
     });
+
+    // 底部装饰
+    ctx.fillStyle = '#ff6b35';
+    ctx.fillRect(30, H-90, W-60, 4);
+    ctx.font = '18px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#c4a080';
+    ctx.fillText('✦ 美食工坊 ✦', W/2, H-50);
 
     drawWatermark();
   }
 
   function drawStep(idx, progress, img) {
-    const colors = ['#f4a261', '#e76f51', '#e9c46a', '#2a9d8f', '#264653', '#ff6b35', '#d85a1f', '#c47020'];
-    const c = colors[idx % colors.length];
-
-    // 绘制图片（如果有）
+    // 绘制 AI 图片（Ken Burns 效果）
     if (img) {
-      // Ken Burns 效果
-      const zoom = 1 + progress * 0.12;
+      const zoom = 1 + progress * 0.15;
       const sw = W / zoom;
       const sh = H / zoom;
       const sx = (W - sw) / 2;
@@ -444,91 +538,139 @@ $('#btn-video').onclick = async () => {
       ctx.drawImage(img, sx, sy, sw, sh, 0, 0, W, H);
       ctx.restore();
 
-      // 暗角
-      drawVignette(0.5);
+      // 底部半透明文字区
+      ctx.fillStyle = 'rgba(10,5,2,0.7)';
+      ctx.fillRect(0, H*0.58, W, H*0.42);
+
+      // 渐变叠加
+      const topGrad = ctx.createLinearGradient(0, H*0.5, 0, H*0.58);
+      topGrad.addColorStop(0, 'rgba(0,0,0,0.6)');
+      topGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = topGrad;
+      ctx.fillRect(0, H*0.5, W, H*0.1);
+
     } else {
       // 无图片时用渐变背景
-      ctx.fillStyle = c;
-      ctx.fillRect(0, 0, W, H);
+      const colors = ['#c0392b','#d35400','#e67e22','#27ae60','#2980b9','#8e44ad','#16a085','#2c3e50'];
+      const c = colors[idx % colors.length];
       const grd = ctx.createLinearGradient(0, 0, W, H);
       grd.addColorStop(0, c);
-      grd.addColorStop(1, '#2c1810');
+      grd.addColorStop(1, '#1a1a1a');
       ctx.fillStyle = grd;
       ctx.fillRect(0, 0, W, H);
     }
 
-    // 底部文字区域
-    ctx.fillStyle = 'rgba(0,0,0,0.6)';
-    ctx.fillRect(0, H*0.55, W, H*0.45);
-
-    // 步骤编号
-    ctx.font = 'bold 38px sans-serif';
+    // 步骤编号标签
+    ctx.fillStyle = 'rgba(255,107,53,0.9)';
+    roundRect(ctx, 40, 35, 180, 55, 12);
+    ctx.fill();
+    ctx.font = 'bold 28px sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillStyle = 'rgba(255,255,255,0.95)';
-    ctx.fillText(`步骤 ${idx+1} / ${steps.length}`, 60, 90);
+    ctx.fillStyle = '#fff';
+    ctx.fillText(`步骤 ${idx+1} / ${steps.length}`, 55, 72);
 
-    // 解说文字（卡拉OK效果）
-    const text = steps[idx].text;
-    const charDuration = stepMs * 0.7 / text.length;
-    const charsRevealed = Math.min(Math.floor(progress * stepMs / charDuration), text.length);
+    // AI 生成的解说文字（卡拉OK逐字效果）
+    const text = steps[idx];
+    const textDuration = stepMs * 0.75;
+    const revealProgress = Math.min(1, progress * stepMs / textDuration);
+    const charsRevealed = Math.floor(revealProgress * text.length);
 
-    ctx.font = 'bold 32px sans-serif';
+    ctx.font = 'bold 30px sans-serif';
     ctx.textAlign = 'center';
 
-    // 已读文字（橙色）
+    // 背景条
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    roundRect(ctx, 30, H*0.62, W-60, 100, 10);
+    ctx.fill();
+
+    // 已读文字（橙色渐变）
     const revealedText = text.substring(0, charsRevealed);
-    ctx.fillStyle = '#ff6b35';
-    wrapText(ctx, revealedText, W/2, H*0.65, W-120, 42);
+    if (revealedText) {
+      const grad = ctx.createLinearGradient(0, H*0.62, 0, H*0.62+40);
+      grad.addColorStop(0, '#ffcc00');
+      grad.addColorStop(1, '#ff6b35');
+      ctx.fillStyle = grad;
+      wrapText(ctx, revealedText, W/2, H*0.62+45, W-80, 40);
+    }
 
     // 未读文字（灰色）
     const unrevealedText = text.substring(charsRevealed);
-    ctx.fillStyle = '#c4a080';
-    wrapText(ctx, unrevealedText, W/2, H*0.65 + charsRevealed * 0, W-120, 42);
+    if (unrevealedText) {
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      wrapText(ctx, unrevealedText, W/2, H*0.62+45 + charsRevealed * 0, W-80, 40);
+    }
 
-    // 大号步骤数字
-    ctx.fillStyle = 'rgba(255,255,255,0.15)';
-    ctx.font = 'bold 180px sans-serif';
+    // 语音朗读（步骤开始时）
+    if (progress < 0.03 && idx === 0 || (progress < 0.03 && charsRevealed === 1)) {
+      speak(text.substring(0, Math.min(40, text.length)));
+    }
+
+    // 大号装饰数字
+    ctx.fillStyle = 'rgba(255,255,255,0.08)';
+    ctx.font = 'bold 200px sans-serif';
     ctx.textAlign = 'right';
-    ctx.fillText((idx+1).toString(), W-40, H-40);
+    ctx.fillText((idx+1).toString(), W-20, H-20);
 
+    // 暗角
+    drawVignette(0.5);
     drawWatermark();
   }
 
   function drawEnd(progress) {
-    ctx.fillStyle = '#ff6b35';
-    ctx.fillRect(0, 0, W, H);
-
-    // Ken Burns
-    const zoom = 1 + progress * 0.05;
+    const zoom = 1 + progress * 0.08;
     ctx.save();
     ctx.translate(W/2, H/2);
     ctx.scale(zoom, zoom);
     ctx.translate(-W/2, -H/2);
-    ctx.fillStyle = '#ff6b35';
+
+    const grd = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, H*0.7);
+    grd.addColorStop(0, '#ff6b35');
+    grd.addColorStop(1, '#8b0000');
+    ctx.fillStyle = grd;
     ctx.fillRect(0, 0, W, H);
     ctx.restore();
 
-    ctx.font = 'bold 100px sans-serif';
+    drawVignette(0.3);
+
+    ctx.font = 'bold 110px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillStyle = '#fff';
-    ctx.fillText(state.recipe.emoji, W/2, H/2 - 80);
+    ctx.shadowColor = 'rgba(0,0,0,0.4)';
+    ctx.shadowBlur = 30;
+    ctx.fillText(state.recipe.emoji, W/2, H/2 - 100);
+    ctx.shadowBlur = 0;
 
-    ctx.font = 'bold 44px sans-serif';
-    ctx.fillText(state.theme, W/2, H/2);
+    ctx.font = 'bold 46px sans-serif';
+    ctx.fillStyle = '#fff';
+    ctx.fillText(state.theme, W/2, H/2 - 10);
 
-    ctx.font = '28px sans-serif';
+    ctx.font = '30px sans-serif';
     ctx.fillStyle = 'rgba(255,255,255,0.9)';
-    ctx.fillText('🎉 开动啦！', W/2, H/2 + 80);
+    ctx.fillText('🎉 开动啦！', W/2, H/2 + 70);
 
     ctx.font = '22px sans-serif';
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    ctx.fillText('✦ 美食工坊 一键生成 ✦', W/2, H-80);
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.fillText('✦ 美食工坊 AI 视频 ✦', W/2, H-50);
 
     drawWatermark();
   }
 
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
   function drawVignette(intensity) {
-    const grd = ctx.createRadialGradient(W/2, H/2, H*0.3, W/2, H/2, H*0.8);
+    const grd = ctx.createRadialGradient(W/2, H/2, H*0.2, W/2, H/2, H*0.85);
     grd.addColorStop(0, 'rgba(0,0,0,0)');
     grd.addColorStop(1, `rgba(0,0,0,${intensity})`);
     ctx.fillStyle = grd;
@@ -537,10 +679,10 @@ $('#btn-video').onclick = async () => {
 
   function drawWatermark() {
     if (!state.watermark) return;
-    ctx.font = '16px sans-serif';
+    ctx.font = '18px sans-serif';
     ctx.textAlign = 'right';
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-    ctx.fillText('@美食工坊', W-30, H-20);
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.fillText('@美食工坊', W-25, H-25);
   }
 
   function wrapText(ctx, text, x, y, maxW, lh) {
@@ -566,7 +708,6 @@ $('#btn-video').onclick = async () => {
     return new Promise(r => setTimeout(r, ms));
   }
 
-  // 录制循环
   async function record() {
     const scenes = [];
     scenes.push({ type: 'cover', duration: coverMs });
@@ -576,7 +717,7 @@ $('#btn-video').onclick = async () => {
     }
 
     for (let i = 0; i < n; i++) {
-      scenes.push({ type: 'step', idx: i, duration: stepMs, img: images[i] });
+      scenes.push({ type: 'step', idx: i, duration: stepMs, img: state.stepImages[i] });
     }
 
     scenes.push({ type: 'end', duration: endMs });
@@ -589,19 +730,19 @@ $('#btn-video').onclick = async () => {
         if (s.type === 'cover') {
           drawCover(p);
         } else if (s.type === 'ing') {
-          drawIngredients(p);
+          drawIngredients();
         } else if (s.type === 'step') {
           drawStep(s.idx, p, s.img);
-          // 语音解说（只在步骤开始时）
-          if (p < 0.05) {
-            speak(steps[s.idx].text.substring(0, 30));
-          }
         } else if (s.type === 'end') {
           drawEnd(p);
         }
 
         p = Math.min(1, (performance.now() - start) / s.duration);
         await sleep(16);
+      }
+
+      if (s.type === 'step') {
+        playStepSound();
       }
     }
 
@@ -612,5 +753,5 @@ $('#btn-video').onclick = async () => {
   setTimeout(record, 200);
 };
 
-console.log('🍳 美食工坊 v2.1 已加载 - 真实图片 + 音效 + 语音 + Ken Burns');
+console.log('🍳 美食工坊 v3.0 已加载 - DALL-E AI 图片生成');
 </script></body></html>
