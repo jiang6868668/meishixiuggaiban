@@ -2,7 +2,7 @@
    Service Worker · 美食视频工坊离线缓存
    ============================================================ */
 
-const CACHE_NAME = 'recipe-video-studio-v1';
+const CACHE_NAME = 'recipe-video-studio-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -42,7 +42,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-/* 请求拦截：先查缓存，缓存失败再走网络 */
+/* 请求拦截：网络优先，失败回退缓存 */
 self.addEventListener('fetch', (event) => {
   const req = event.request;
 
@@ -51,32 +51,29 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(req.url);
 
-  /* 对同源请求使用"缓存优先，回退网络" */
+  /* 对同源请求使用"网络优先，缓存回退"（保证用户总能看到最新版本） */
   if (url.origin === self.location.origin) {
     event.respondWith(
-      caches.match(req).then((cached) => {
-        return (
-          cached ||
-          fetch(req)
-            .then((response) => {
-              /* 克隆响应以便一边返回一边写入缓存 */
-              const clone = response.clone();
-              caches.open(CACHE_NAME).then((cache) => {
-                cache.put(req, clone).catch(() => {});
-              });
-              return response;
-            })
-            .catch(() => {
-              /* 网络失败，且无缓存时返回离线首页 */
-              return caches.match('./index.html');
-            })
-        );
-      })
+      fetch(req)
+        .then((response) => {
+          /* 克隆响应以便一边返回一边写入缓存 */
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(req, clone).catch(() => {});
+          });
+          return response;
+        })
+        .catch(() => {
+          /* 网络失败时回退到缓存 */
+          return caches.match(req).then((cached) => {
+            return cached || caches.match('./index.html');
+          });
+        })
     );
     return;
   }
 
-  /* 跨域请求（如字体）走网络优先 */
+  /* 跨域请求（如图片）走网络优先 */
   event.respondWith(
     fetch(req)
       .then((response) => {
