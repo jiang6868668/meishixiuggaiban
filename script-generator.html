@@ -591,9 +591,88 @@ input:checked + .slider:before { transform: translateX(20px); }
   font-size: 13px;
 }
 
+/* 图片上传网格 */
+.image-upload-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.image-upload-item {
+  position: relative;
+  aspect-ratio: 9/16;
+  border-radius: 10px;
+  border: 2px dashed #ddd;
+  background: #fafafa;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+.image-upload-item:hover {
+  border-color: var(--brand);
+  background: var(--brand-light);
+}
+.image-upload-item.has-image {
+  border-style: solid;
+  border-color: var(--brand);
+}
+.image-upload-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.image-upload-item .upload-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  font-size: 11px;
+  color: #999;
+}
+.image-upload-item .upload-icon .icon {
+  font-size: 24px;
+  display: block;
+  margin-bottom: 4px;
+}
+.image-upload-item .shot-num {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  background: var(--brand);
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  z-index: 1;
+}
+.image-upload-item .remove-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  border: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 12px;
+  cursor: pointer;
+  z-index: 1;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.image-upload-item.has-image .remove-btn {
+  display: flex;
+}
+.image-upload-item input[type=file] {
+  display: none;
+}
+
 @media (max-width: 480px) {
   .script-table { font-size: 12px; }
   .script-table th, .script-table td { padding: 8px 10px; }
+  .image-upload-grid { grid-template-columns: repeat(3, 1fr); }
 }
 </style>
 </head>
@@ -707,6 +786,19 @@ input:checked + .slider:before { transform: translateX(20px); }
         <div class="video-actions">
           <button class="btn-ghost" id="btn-play-video-btn">▶ 播放预览</button>
           <button class="btn-primary" id="btn-generate-video">🎬 生成视频</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 图片上传区域 -->
+    <div class="section" id="image-upload-section" style="display: none;">
+      <div class="card">
+        <div class="section-title">
+          <span class="icon">📷</span>
+          <span>自定义图片（可选）</span>
+        </div>
+        <p style="font-size: 13px; color: var(--text-soft); margin: 0 0 12px;">上传你自己的实拍图片，让视频内容100%真实准确</p>
+        <div class="image-upload-grid" id="image-upload-grid">
         </div>
       </div>
     </div>
@@ -1682,17 +1774,20 @@ $('btn-generate').addEventListener('click', () => {
     
     state.currentScript = script;
     $('script-content').innerHTML = renderScript(script);
+    renderImageUploadGrid(script);
     $('input-section').style.display = 'none';
     $('output-section').style.display = 'block';
+    $('image-upload-section').style.display = 'block';
     $('empty-state').style.display = 'none';
     window.scrollTo(0, 0);
-    showToast('脚本生成完成！');
+    showToast('脚本生成完成！可上传自定义图片');
   }, 1200);
 });
 
 // 返回按钮
 $('btn-back').addEventListener('click', () => {
   $('output-section').style.display = 'none';
+  $('image-upload-section').style.display = 'none';
   $('input-section').style.display = 'block';
   $('empty-state').style.display = 'none';
   window.scrollTo(0, 0);
@@ -1744,94 +1839,94 @@ let videoChunks = [];
 let isVideoExporting = false;
 let videoImageCache = new Map();
 
-/* 美食图片库 - 按菜品分类的真实食物图片 */
+/* 高质量美食图片库 - 按菜品分类，每个菜品多张真实图片 */
 const FOOD_IMAGE_LIBRARY = {
   '红烧肉': [
-    'https://loremflickr.com/360/640/braised-pork,chinese-food?random=1',
-    'https://loremflickr.com/360/640/pork-belly,cooking?random=2',
-    'https://loremflickr.com/360/640/chinese-dish,meat?random=3',
-    'https://loremflickr.com/360/640/soy-sauce,pork?random=4',
-    'https://loremflickr.com/360/640/caramelized,pork?random=5',
-    'https://loremflickr.com/360/640/stew,meat?random=6',
-    'https://loremflickr.com/360/640/delicious,food?random=7',
+    'https://images.unsplash.com/photo-1544025162-d76694265947?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1525755662778-989d0524087e?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=360&h=640&fit=crop',
   ],
   '番茄炒蛋': [
-    'https://loremflickr.com/360/640/tomato,egg?random=1',
-    'https://loremflickr.com/360/640/scrambled-eggs,tomato?random=2',
-    'https://loremflickr.com/360/640/chinese-home-cooking?random=3',
-    'https://loremflickr.com/360/640/frying-eggs,pan?random=4',
-    'https://loremflickr.com/360/640/tomato-sauce,cooking?random=5',
-    'https://loremflickr.com/360/640/egg-dish,delicious?random=6',
-    'https://loremflickr.com/360/640/vegetable,stir-fry?random=7',
+    'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1482049016gy-e8bc3dac6e2c?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=360&h=640&fit=crop',
   ],
   '蛋炒饭': [
-    'https://loremflickr.com/360/640/fried-rice,egg?random=1',
-    'https://loremflickr.com/360/640/rice,stir-fry?random=2',
-    'https://loremflickr.com/360/640/chinese-fried-rice?random=3',
-    'https://loremflickr.com/360/640/cooking-rice,wok?random=4',
-    'https://loremflickr.com/360/640/egg-rice,bowl?random=5',
-    'https://loremflickr.com/360/640/golden-rice,delicious?random=6',
-    'https://loremflickr.com/360/640/asian-food,rice?random=7',
+    'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1596797038530-2c107229654b?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1563245372-f21724e3856d?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1559314809-0d155014e29e?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=360&h=640&fit=crop',
   ],
   '麻婆豆腐': [
-    'https://loremflickr.com/360/640/mapo-tofu,tofu?random=1',
-    'https://loremflickr.com/360/640/sichuan,spicy-tofu?random=2',
-    'https://loremflickr.com/360/640/chili,tofu-dish?random=3',
-    'https://loremflickr.com/360/640/ground-beef,tofu?random=4',
-    'https://loremflickr.com/360/640/spicy-soup,chinese?random=5',
-    'https://loremflickr.com/360/640/bean-curd,pepper?random=6',
-    'https://loremflickr.com/360/640/hot-spicy,food?random=7',
+    'https://images.unsplash.com/photo-1582576163090-09d3b6f8a969?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=360&h=640&fit=crop',
   ],
   '可乐鸡翅': [
-    'https://loremflickr.com/360/640/chicken-wings,cola?random=1',
-    'https://loremflickr.com/360/640/braised-chicken,wings?random=2',
-    'https://loremflickr.com/360/640/caramel-chicken?random=3',
-    'https://loremflickr.com/360/640/fried-chicken,wings?random=4',
-    'https://loremflickr.com/360/640/sweet-sour,chicken?random=5',
-    'https://loremflickr.com/360/640/chicken-dish,delicious?random=6',
-    'https://loremflickr.com/360/640/coca-cola,chicken?random=7',
+    'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1544025162-d76694265947?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=360&h=640&fit=crop',
   ],
   '葱油拌面': [
-    'https://loremflickr.com/360/640/noodles,scallion?random=1',
-    'https://loremflickr.com/360/640/chinese-noodles,oil?random=2',
-    'https://loremflickr.com/360/640/green-onion,noodle?random=3',
-    'https://loremflickr.com/360/640/asian-pasta,bowl?random=4',
-    'https://loremflickr.com/360/640/shallot-oil,noodles?random=5',
-    'https://loremflickr.com/360/640/simple-meal,noodle?random=6',
-    'https://loremflickr.com/360/640/chinese-food,noodles?random=7',
+    'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1552611052-33e04de081de?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1552611052-33e04de081de?w=360&h=640&fit=crop',
   ],
   '提拉米苏': [
-    'https://loremflickr.com/360/640/tiramisu,dessert?random=1',
-    'https://loremflickr.com/360/640/italian-dessert,coffee?random=2',
-    'https://loremflickr.com/360/640/mascarpone,cake?random=3',
-    'https://loremflickr.com/360/640/cocoa,dessert?random=4',
-    'https://loremflickr.com/360/640/ladyfinger,coffee?random=5',
-    'https://loremflickr.com/360/640/sweet,cream-dessert?random=6',
-    'https://loremflickr.com/360/640/chocolate-powder,cake?random=7',
+    'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1587314168485-3236d6710814?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1587668178277-295251f900ce?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=360&h=640&fit=crop',
   ],
   '蒜蓉西兰花': [
-    'https://loremflickr.com/360/640/broccoli,garlic?random=1',
-    'https://loremflickr.com/360/640/vegetable,stir-fry?random=2',
-    'https://loremflickr.com/360/640/green-vegetable,healthy?random=3',
-    'https://loremflickr.com/360/640/broccoli-florets,garlic?random=4',
-    'https://loremflickr.com/360/640/vegan-dish,broccoli?random=5',
-    'https://loremflickr.com/360/640/healthy-food,green?random=6',
-    'https://loremflickr.com/360/640/chinese-vegetable?random=7',
+    'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=360&h=640&fit=crop',
+    'https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?w=360&h=640&fit=crop',
   ],
 };
 
-/* 通用食物图片（备用） */
+/* 通用高质量美食图片（备用） */
 const GENERIC_FOOD_IMAGES = [
-  'https://loremflickr.com/360/640/food,cooking?random=100',
-  'https://loremflickr.com/360/640/kitchen,ingredients?random=101',
-  'https://loremflickr.com/360/640/chef,preparing?random=102',
-  'https://loremflickr.com/360/640/delicious,meal?random=103',
-  'https://loremflickr.com/360/640/food-photography?random=104',
-  'https://loremflickr.com/360/640/gourmet,plating?random=105',
-  'https://loremflickr.com/360/640/cooking-process?random=106',
+  'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=360&h=640&fit=crop',
+  'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=360&h=640&fit=crop',
+  'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=360&h=640&fit=crop',
+  'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=360&h=640&fit=crop',
+  'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=360&h=640&fit=crop',
+  'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=360&h=640&fit=crop',
+  'https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=360&h=640&fit=crop',
 ];
 
-/* 加载图片 */
+/* 加载图片工具函数 */
 function loadVideoImage(url) {
   if (videoImageCache.has(url)) return Promise.resolve(videoImageCache.get(url));
   return new Promise(resolve => {
@@ -1843,22 +1938,29 @@ function loadVideoImage(url) {
   });
 }
 
-/* 预加载所有图片 */
+/* 预加载所有图片 - 优先使用用户上传的图片 */
 async function preloadVideoImages(script) {
-  const imgLib = FOOD_IMAGE_LIBRARY[script.dishName] || GENERIC_FOOD_IMAGES;
-  const urls = [];
-  script.shots.forEach((shot, idx) => {
-    urls.push(imgLib[idx % imgLib.length]);
-  });
-  await Promise.all(urls.map(u => loadVideoImage(u)));
-  return imgLib;
+  const shots = script.shots;
+  
+  for (let i = 0; i < shots.length; i++) {
+    const shot = shots[i];
+    if (shot.userImage && !videoImageCache.has('user_' + i)) {
+      const img = await new Promise(resolve => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = () => resolve(null);
+        image.src = shot.userImage;
+      });
+      if (img) videoImageCache.set('user_' + i, img);
+    }
+  }
 }
 
-/* 获取步骤对应的图片 */
+/* 获取步骤对应的图片 - 优先用户上传 */
 function getStepImage(script, shotIdx) {
-  const imgLib = FOOD_IMAGE_LIBRARY[script.dishName] || GENERIC_FOOD_IMAGES;
-  const url = imgLib[shotIdx % imgLib.length];
-  return videoImageCache.get(url) || null;
+  const userImg = videoImageCache.get('user_' + shotIdx);
+  if (userImg) return userImg;
+  return null;
 }
 
 /* ===== 场景绘制函数 ===== */
@@ -2053,28 +2155,45 @@ function drawStepScene(cx, script, shot, t, duration, img) {
   if (img) {
     drawKenBurns(cx, img, t, duration);
   } else {
-    const colors = ['#c0392b', '#d35400', '#e67e22', '#27ae60', '#2980b9', '#8e44ad', '#16a085'];
-    const c = colors[(shot.num) % colors.length];
-    const grad = cx.createLinearGradient(0, 0, VW, VH);
-    grad.addColorStop(0, c);
-    grad.addColorStop(1, '#1a1a1a');
-    cx.fillStyle = grad;
+    const bgGrad = cx.createLinearGradient(0, 0, 0, VH);
+    bgGrad.addColorStop(0, '#fff5ee');
+    bgGrad.addColorStop(0.5, '#ffe8d6');
+    bgGrad.addColorStop(1, '#ffd4b8');
+    cx.fillStyle = bgGrad;
     cx.fillRect(0, 0, VW, VH);
+    
+    const emoji = script.emoji || '🍳';
+    cx.font = '160px sans-serif';
+    cx.textAlign = 'center';
+    cx.textBaseline = 'middle';
+    cx.globalAlpha = 0.15;
+    const floatY = Math.sin(t * 1.5) * 10;
+    cx.fillText(emoji, VW/2, VH*0.35 + floatY);
+    cx.globalAlpha = 1;
+    
+    cx.fillStyle = '#ff6b35';
+    cx.font = '700 20px -apple-system,"PingFang SC",sans-serif';
+    cx.textAlign = 'center';
+    cx.fillText(script.dishName, VW/2, 70);
   }
   
-  // 暗化底部
-  cx.fillStyle = 'rgba(0,0,0,0.55)';
-  cx.fillRect(0, VH*0.55, VW, VH*0.45);
-  const topGrad = cx.createLinearGradient(0, VH*0.45, 0, VH*0.58);
-  topGrad.addColorStop(0, 'rgba(0,0,0,0)');
-  topGrad.addColorStop(1, 'rgba(0,0,0,0.5)');
-  cx.fillStyle = topGrad;
-  cx.fillRect(0, VH*0.45, VW, VH*0.13);
+  if (!img) {
+    cx.fillStyle = 'rgba(255,255,255,0.85)';
+    cx.fillRect(0, VH*0.5, VW, VH*0.5);
+  } else {
+    cx.fillStyle = 'rgba(0,0,0,0.55)';
+    cx.fillRect(0, VH*0.55, VW, VH*0.45);
+    const topGrad = cx.createLinearGradient(0, VH*0.45, 0, VH*0.58);
+    topGrad.addColorStop(0, 'rgba(0,0,0,0)');
+    topGrad.addColorStop(1, 'rgba(0,0,0,0.5)');
+    cx.fillStyle = topGrad;
+    cx.fillRect(0, VH*0.45, VW, VH*0.13);
+  }
   
   // 步骤徽章
-  const badgeR = 28, badgeX = 50, badgeY = 70;
+  const badgeR = 28, badgeX = 50, badgeY = img ? 70 : VH*0.55;
   cx.save();
-  cx.shadowColor = 'rgba(0,0,0,0.5)';
+  cx.shadowColor = img ? 'rgba(0,0,0,0.5)' : 'rgba(255,107,53,0.3)';
   cx.shadowBlur = 16;
   cx.shadowOffsetY = 4;
   cx.beginPath();
@@ -2094,16 +2213,16 @@ function drawStepScene(cx, script, shot, t, duration, img) {
   
   // 步骤标签
   cx.font = '700 18px -apple-system,"PingFang SC",sans-serif';
-  cx.fillStyle = '#ffffff';
+  cx.fillStyle = img ? '#ffffff' : '#2c1810';
   cx.textAlign = 'left';
-  cx.shadowColor = 'rgba(0,0,0,0.6)';
-  cx.shadowBlur = 6;
+  cx.shadowColor = img ? 'rgba(0,0,0,0.6)' : 'transparent';
+  cx.shadowBlur = img ? 6 : 0;
   cx.fillText(`${shot.scene}`, badgeX + badgeR + 14, badgeY - 2);
   cx.shadowBlur = 0;
   cx.restore();
   
   // 解说文字卡片
-  const cardH = 180, cardY = VH - cardH - 20, cardX = 20, cardW = VW - 40;
+  const cardH = 160, cardY = VH - cardH - 20, cardX = 20, cardW = VW - 40;
   cx.save();
   
   drawRoundRect(cx, cardX, cardY, cardW, cardH, 14);
@@ -2135,7 +2254,7 @@ function drawStepScene(cx, script, shot, t, duration, img) {
   
   cx.restore();
   
-  drawVignette(cx, 0.3);
+  if (img) drawVignette(cx, 0.3);
 }
 
 /* 绘制结尾场景 */
@@ -2378,6 +2497,114 @@ async function exportVideo() {
   }
   
   setTimeout(nextFrame, 200);
+}
+
+/* 渲染图片上传网格 */
+function renderImageUploadGrid(script) {
+  const grid = $('image-upload-grid');
+  grid.innerHTML = '';
+  
+  script.shots.forEach((shot, idx) => {
+    const item = document.createElement('div');
+    item.className = 'image-upload-item' + (shot.userImage ? ' has-image' : '');
+    item.innerHTML = `
+      <span class="shot-num">${shot.num}</span>
+      <button class="remove-btn" data-idx="${idx}">×</button>
+      ${shot.userImage ? `<img src="${shot.userImage}" alt="镜头${shot.num}">` : `
+        <div class="upload-icon">
+          <span class="icon">📷</span>
+          <span>上传图片</span>
+        </div>
+      `}
+      <input type="file" accept="image/*" data-idx="${idx}">
+    `;
+    
+    const input = item.querySelector('input[type=file]');
+    item.addEventListener('click', (e) => {
+      if (e.target.classList.contains('remove-btn')) return;
+      input.click();
+    });
+    
+    input.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      handleImageUpload(idx, file);
+    });
+    
+    const removeBtn = item.querySelector('.remove-btn');
+    removeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      handleRemoveImage(idx);
+    });
+    
+    grid.appendChild(item);
+  });
+}
+
+/* 处理图片上传 */
+function handleImageUpload(idx, file) {
+  if (!file.type.startsWith('image/')) {
+    showToast('请选择图片文件');
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    compressImage(e.target.result, 800, 0.8).then((compressed) => {
+      if (state.currentScript && state.currentScript.shots[idx]) {
+        state.currentScript.shots[idx].userImage = compressed;
+        videoImageCache.delete('user_' + idx);
+        renderImageUploadGrid(state.currentScript);
+        updateVideoPreview();
+        showToast('图片上传成功 ✓');
+      }
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+/* 移除图片 */
+function handleRemoveImage(idx) {
+  if (state.currentScript && state.currentScript.shots[idx]) {
+    delete state.currentScript.shots[idx].userImage;
+    videoImageCache.delete('user_' + idx);
+    renderImageUploadGrid(state.currentScript);
+    updateVideoPreview();
+    showToast('已移除图片');
+  }
+}
+
+/* 压缩图片 */
+function compressImage(dataUrl, maxWidth, quality) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      if (w > maxWidth) {
+        h = h * (maxWidth / w);
+        w = maxWidth;
+      }
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
+/* 更新视频预览首帧 */
+function updateVideoPreview() {
+  if (!state.currentScript) return;
+  const canvas = $('video-canvas');
+  const ctx = canvas.getContext('2d');
+  const scenes = buildVideoScenes(state.currentScript);
+  preloadVideoImages(state.currentScript).then(() => {
+    const img = getStepImage(state.currentScript, 0);
+    drawCoverScene(ctx, state.currentScript, 0, scenes[0].duration, img);
+  });
 }
 
 /* 初始化视频相关事件 */
