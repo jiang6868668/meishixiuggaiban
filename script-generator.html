@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#ff6b35">
+<title>🎬 美食视频脚本生成器</title>
+<style>
+:root {
+  --brand: #ff6b35;
+  --brand-dark: #e85a24;
+  --brand-light: #fff3ec;
+  --accent: #f7c59f;
+  --success: #4caf50;
+  --text: #2a2a2a;
+  --text-soft: #6b6b6b;
+  --text-light: #9a9a9a;
+  --bg: #faf8f5;
+  --card: #ffffff;
+  --border: #ececec;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 8px 24px rgba(255, 107, 53, 0.18);
+  --radius: 14px;
+  --radius-lg: 20px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#app {
+  max-width: 680px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  background: var(--bg);
+}
+
+/* ---------- HERO ---------- */
+.hero {
+  position: relative;
+  padding: calc(50px + var(--safe-top)) 24px 40px;
+  overflow: hidden;
+  border-bottom-left-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-lg);
+  background: linear-gradient(135deg, #ff9558 0%, #ff6b35 50%, #e85a24 100%);
+  color: #fff;
+  box-shadow: var(--shadow-lg);
+}
+.hero-gradient {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,0.15) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(255,200,150,0.2) 0%, transparent 40%);
+  pointer-events: none;
+}
+.hero-content { position: relative; z-index: 1; text-align: center; }
+.logo {
+  font-size: 48px;
+  margin-bottom: 6px;
+  display: inline-block;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2));
+}
+.hero h1 { margin: 4px 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+.subtitle { margin: 6px 0 0; opacity: 0.92; font-size: 13px; }
+
+/* ---------- SECTIONS ---------- */
+.section {
+  padding: 0 16px;
+  margin-top: 20px;
+}
+.section-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.section-title .icon { font-size: 18px; }
+
+/* ---------- CARD ---------- */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 14px;
+}
+
+/* ---------- INPUT ---------- */
+.field-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-soft);
+  margin-bottom: 8px;
+}
+input[type="text"], select, textarea {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 15px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: #fafafa;
+  color: var(--text);
+  font-family: inherit;
+  transition: all 0.2s;
+  outline: none;
+}
+input[type="text"]:focus, select:focus, textarea:focus {
+  border-color: var(--brand);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+}
+textarea { resize: vertical; min-height: 80px; }
+
+/* ---------- CHIPS ---------- */
+.chip-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.chip {
+  padding: 8px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 100px;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.chip:active { transform: scale(0.96); }
+.chip.active {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(255,107,53,0.3);
+}
+
+/* ---------- BUTTONS ---------- */
+.btn-primary, .btn-ghost, .btn-outline {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(255, 107, 53, 0.35);
+}
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+.btn-ghost {
+  background: #fff;
+  border: 1.5px solid var(--border);
+  color: var(--text);
+}
+.btn-ghost:active { background: #f5f5f5; }
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid var(--brand);
+  color: var(--brand);
+}
+.btn-outline:active { background: var(--brand-light); }
+
+.btn-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+/* ---------- SCRIPT OUTPUT ---------- */
+.script-output {
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.script-header {
+  background: linear-gradient(135deg, #2c1810 0%, #4a2820 100%);
+  color: #fff;
+  padding: 18px 20px;
+}
+.script-header h2 {
+  margin: 0 0 4px;
+  font-size: 20px;
+  font-weight: 700;
+}
+.script-header .meta {
+  font-size: 12px;
+  opacity: 0.8;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.script-header .meta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Script table */
+.script-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.script-table th {
+  background: #f5f0eb;
+  color: var(--text-soft);
+  font-weight: 600;
+  font-size: 12px;
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+}
+.script-table td {
+  padding: 12px;
+  border-bottom: 1px solid #f0ebe6;
+  vertical-align: top;
+  line-height: 1.55;
+}
+.script-table tr:last-child td { border-bottom: none; }
+.script-table .shot-num {
+  font-weight: 700;
+  color: var(--brand);
+  width: 50px;
+  text-align: center;
+}
+.script-table .shot-type {
+  color: #8b6914;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  width: 70px;
+}
+.script-table .visual { color: var(--text); }
+.script-table .audio {
+  color: var(--text-soft);
+  font-style: italic;
+}
+.script-table .duration {
+  text-align: center;
+  color: var(--brand-dark);
+  font-weight: 600;
+  width: 55px;
+  font-size: 12px;
+}
+.script-table .note {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-top: 4px;
+}
+
+/* Section dividers in script */
+.scene-divider {
+  background: linear-gradient(90deg, var(--brand-light), #fff, var(--brand-light));
+  padding: 8px 16px;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--brand-dark);
+  border-left: 4px solid var(--brand);
+}
+
+/* Tips section */
+.tips-section {
+  padding: 16px 20px;
+  background: #fffbf7;
+  border-top: 1px solid #ffe8d6;
+}
+.tips-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--brand-dark);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tips-list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+.tips-list li { margin-bottom: 4px; }
+
+/* ---------- LOADING ---------- */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fadeIn 0.2s;
+}
+.loading-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px 36px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  max-width: 280px;
+}
+.spinner {
+  width: 40px; height: 40px;
+  border: 3px solid #ffe4d4;
+  border-top-color: var(--brand);
+  border-radius: 50%;
+  margin: 0 auto 14px;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-card p { margin: 0; color: var(--text-soft); font-size: 14px; }
+.loading-card .loading-status {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ---------- TOAST ---------- */
+.toast {
+  position: fixed;
+  bottom: calc(40px + var(--safe-bottom));
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(42,42,42,0.94);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 100px;
+  font-size: 13px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s;
+  z-index: 200;
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ---------- EXPORT BAR ---------- */
+.export-bar {
+  position: sticky;
+  bottom: 0;
+  background: rgba(255,255,255,0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 12px 16px calc(12px + var(--safe-bottom));
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+  z-index: 10;
+}
+.export-bar .btn-primary, .export-bar .btn-ghost {
+  flex: 1;
+  padding: 12px;
+  font-size: 14px;
+}
+
+/* ---------- RECIPE SUGGESTIONS ---------- */
+.suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.suggestion-tag {
+  padding: 6px 12px;
+  background: var(--brand-light);
+  color: var(--brand-dark);
+  border-radius: 100px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.suggestion-tag:active {
+  background: var(--brand);
+  color: #fff;
+}
+
+/* ---------- EMPTY STATE ---------- */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-light);
+}
+.empty-state .icon {
+  font-size: 64px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+.empty-state p {
+  margin: 4px 0;
+  font-size: 14px;
+}
+.empty-state .hint {
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+/* ---------- SWITCH ---------- */
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+.switch-label {
+  font-size: 14px;
+  color: var(--text);
+}
+.switch-desc {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+.switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ddd;
+  transition: .3s;
+  border-radius: 24px;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+}
+input:checked + .slider { background-color: var(--brand); }
+input:checked + .slider:before { transform: translateX(20px); }
+
+@media (max-width: 480px) {
+  .script-table { font-size: 12px; }
+  .script-table th, .script-table td { padding: 8px 10px; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-gradient"></div>
+    <div class="hero-content">
+      <div class="logo">🎬</div>
+      <h1>美食视频脚本生成器</h1>
+      <p class="subtitle">输入菜品名称，一键生成专业分镜脚本</p>
+    </div>
+  </div>
+
+  <!-- INPUT SECTION -->
+  <div class="section" id="input-section">
+    <div class="card">
+      <label class="field-label">🍽 菜品名称</label>
+      <input type="text" id="dish-input" placeholder="例如：红烧肉、番茄炒蛋、提拉米苏..." />
+      <div class="suggestions" id="suggestions">
+        <span class="suggestion-tag" data-dish="红烧肉">红烧肉</span>
+        <span class="suggestion-tag" data-dish="番茄炒蛋">番茄炒蛋</span>
+        <span class="suggestion-tag" data-dish="蛋炒饭">蛋炒饭</span>
+        <span class="suggestion-tag" data-dish="麻婆豆腐">麻婆豆腐</span>
+        <span class="suggestion-tag" data-dish="可乐鸡翅">可乐鸡翅</span>
+        <span class="suggestion-tag" data-dish="葱油拌面">葱油拌面</span>
+        <span class="suggestion-tag" data-dish="提拉米苏">提拉米苏</span>
+        <span class="suggestion-tag" data-dish="蒜蓉西兰花">蒜蓉西兰花</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="field-label">⏱ 视频时长</label>
+      <div class="chip-row" id="duration-chips">
+        <button class="chip active" data-duration="30">30秒</button>
+        <button class="chip" data-duration="60">1分钟</button>
+        <button class="chip" data-duration="90">1分半</button>
+        <button class="chip" data-duration="120">2分钟</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="field-label">🎥 脚本风格</label>
+      <div class="chip-row" id="style-chips">
+        <button class="chip active" data-style="home">家常温馨</button>
+        <button class="chip" data-style="pro">专业教程</button>
+        <button class="chip" data-style="vlog">Vlog 口语</button>
+      </div>
+
+      <div style="margin-top: 14px; border-top: 1px solid var(--border); padding-top: 14px;">
+        <div class="switch-row">
+          <div>
+            <div class="switch-label">加入拍摄技巧备注</div>
+            <div class="switch-desc">在脚本中标注运镜、光线等建议</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="opt-tips" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="switch-row">
+          <div>
+            <div class="switch-label">加入烹饪小贴士</div>
+            <div class="switch-desc">脚本末尾附实用技巧总结</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="opt-cooking-tips" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="btn-generate" style="margin: 16px;">✨ 生成视频脚本</button>
+
+    <div style="text-align: center; padding: 10px 0 30px; color: var(--text-light); font-size: 12px;">
+      基于真实菜谱 · 专业分镜格式 · 去AI化口语表达
+    </div>
+  </div>
+
+  <!-- OUTPUT SECTION -->
+  <div id="output-section" style="display: none;">
+    <div class="section" style="padding-top: 16px;">
+      <button class="btn-ghost" id="btn-back" style="margin-bottom: 12px;">← 返回修改</button>
+    </div>
+    <div id="script-content"></div>
+    <div class="export-bar">
+      <button class="btn-ghost" id="btn-copy">📋 复制脚本</button>
+      <button class="btn-primary" id="btn-export">📥 导出 TXT</button>
+    </div>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div id="empty-state" class="empty-state" style="display: none;">
+    <div class="icon">📝</div>
+    <p>暂无该菜品的脚本模板</p>
+    <p class="hint">可以试试其他菜品，或选择推荐的菜名</p>
+  </div>
+
+</div>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loading" style="display: none;">
+  <div class="loading-card">
+    <div class="spinner"></div>
+    <p>正在生成脚本...</p>
+    <div class="loading-status" id="loading-status">构思分镜中</div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ========================================================
+   美食视频脚本生成器
+   ======================================================== */
+
+/* ==================== STATE ==================== */
+const state = {
+  dish: '',
+  duration: 30,
+  style: 'home',
+  includeTips: true,
+  includeCookingTips: true,
+  currentScript: null,
+};
+
+/* ==================== RECIPE DATABASE ==================== */
+/* 真实菜谱数据库 - 保证内容真实可靠 */
+const RECIPE_DATABASE = {
+  '红烧肉': {
+    emoji: '🥘',
+    intro: '入口即化的经典硬菜',
+    difficulty: '中等',
+    cookTime: '60分钟',
+    ingredients: [
+      { item: '五花肉', amount: '600g' },
+      { item: '冰糖', amount: '30g' },
+      { item: '生抽', amount: '3勺' },
+      { item: '老抽', amount: '1勺' },
+      { item: '料酒', amount: '2勺' },
+      { item: '姜片', amount: '5片' },
+      { item: '葱段', amount: '2段' },
+      { item: '八角', amount: '2颗' },
+      { item: '桂皮', amount: '1小块' },
+    ],
+    steps: [
+      {
+        action: '五花肉切3厘米见方的块，冷水下锅，加2片姜和1勺料酒焯水',
+        detail: '水开后撇去浮沫，煮约5分钟捞出，用温水冲洗干净沥干',
+        tip: '一定要冷水下锅，才能把肉里的血水充分煮出来',
+      },
+      {
+        action: '锅中不放油，小火慢煸五花肉',
+        detail: '煸到肥肉出油，表面微微金黄就盛出来，油留锅里',
+        tip: '这一步是肥而不腻的关键，油脂都逼出来了',
+      },
+      {
+        action: '用锅中的油炒糖色',
+        detail: '放冰糖，小火慢慢炒，从大泡变成小泡，颜色变成琥珀色',
+        tip: '炒糖色一定要小火，盯着点，别炒糊了发苦',
+      },
+      {
+        action: '倒入五花肉快速翻炒上色',
+        detail: '每块肉都裹上糖色，加姜片葱段八角桂皮炒香',
+        tip: '这时候火可以开大一点，翻炒要快',
+      },
+      {
+        action: '加料酒、生抽、老抽调味',
+        detail: '翻炒均匀，让每块肉都吸满酱汁',
+        tip: '老抽不要放太多，不然颜色发黑',
+      },
+      {
+        action: '加入没过肉的热水',
+        detail: '大火烧开后转最小火，盖上盖子炖45分钟',
+        tip: '一定要加热水，加凉水肉会变柴',
+      },
+      {
+        action: '开大火收汁',
+        detail: '汁变浓稠裹在肉上就可以出锅了，撒点葱花点缀',
+        tip: '收汁的时候要不停翻拌，防止糊底',
+      },
+    ],
+    cookingTips: [
+      '选五花肉要选肥瘦相间的，太瘦的做出来口感柴',
+      '炒糖色是红烧肉色泽红亮的关键，也可以用老抽代替但颜色稍差',
+      '炖的时间够才会入口即化，不要心急开大火',
+      '一次加够水，中途加水会影响口感，非要加就加热水',
+    ],
+  },
+
+  '番茄炒蛋': {
+    emoji: '🍅',
+    intro: '最家常也最考验手艺的一道菜',
+    difficulty: '简单',
+    cookTime: '15分钟',
+    ingredients: [
+      { item: '番茄', amount: '3个' },
+      { item: '鸡蛋', amount: '4个' },
+      { item: '小葱', amount: '2根' },
+      { item: '蒜末', amount: '3瓣' },
+      { item: '盐', amount: '少许' },
+      { item: '白糖', amount: '1勺' },
+      { item: '食用油', amount: '适量' },
+    ],
+    steps: [
+      {
+        action: '番茄顶部划十字刀，用开水烫30秒',
+        detail: '皮翘起来后撕掉，番茄切成2厘米大小的块',
+        tip: '不喜欢吃皮的可以这么处理，嫌麻烦也可以不去皮',
+      },
+      {
+        action: '鸡蛋打入碗中，加少许盐打散',
+        detail: '打到起细密的小泡沫就可以了，这样炒出来更蓬松',
+        tip: '加一点点清水或者料酒，鸡蛋会更嫩',
+      },
+      {
+        action: '热锅冷油，油温六成热倒蛋液',
+        detail: '大火快速翻炒，八成熟就盛出来，别炒太老',
+        tip: '油要稍微多一点，鸡蛋才会蓬松',
+      },
+      {
+        action: '锅里留底油，下蒜末小火炒香',
+        detail: '别炒糊了，闻到香味就可以',
+        tip: '用蒜末爆香比葱花更有层次感',
+      },
+      {
+        action: '放番茄块大火翻炒',
+        detail: '边炒边用铲子压一压，让番茄出汁出沙',
+        tip: '这一步要有点耐心，番茄出沙了味道才浓',
+      },
+      {
+        action: '加白糖和盐调味',
+        detail: '糖的量根据番茄的酸甜度调整，盐少放点提鲜',
+        tip: '糖是这道菜的灵魂，能中和番茄的酸味',
+      },
+      {
+        action: '倒入炒好的鸡蛋翻匀',
+        detail: '撒上葱花就可以出锅了，别炒太久',
+        tip: '鸡蛋倒进去翻两下就行，炒久了鸡蛋会老',
+      },
+    ],
+    cookingTips: [
+      '番茄要选熟透的，汤汁多味道浓，那种硬邦邦的炒不出沙',
+      '鸡蛋要嫩，火候是关键，大火快炒，别在锅里停留太久',
+      '糖和盐的比例可以自己调，喜欢甜口多放糖，喜欢咸口少放糖',
+      '如果番茄汤汁不够，可以加一点点水或者番茄酱补一补',
+    ],
+  },
+
+  '蛋炒饭': {
+    emoji: '🍚',
+    intro: '粒粒分明，金黄诱人',
+    difficulty: '简单',
+    cookTime: '10分钟',
+    ingredients: [
+      { item: '隔夜米饭', amount: '2碗' },
+      { item: '鸡蛋', amount: '3个' },
+      { item: '葱花', amount: '2勺' },
+      { item: '火腿丁', amount: '50g' },
+      { item: '盐', amount: '适量' },
+      { item: '白胡椒粉', amount: '少许' },
+      { item: '食用油', amount: '3勺' },
+    ],
+    steps: [
+      {
+        action: '隔夜米饭用手轻轻打散',
+        detail: '让每一粒米都分开，不要有结块',
+        tip: '用隔夜饭做蛋炒饭是黄金法则，水分少才会粒粒分明',
+      },
+      {
+        action: '鸡蛋打散，加一点点盐搅匀',
+        detail: '葱切成葱花，葱白葱绿分开',
+        tip: '鸡蛋不用打太匀，留点蛋白蛋黄的层次更好看',
+      },
+      {
+        action: '锅烧到微微冒烟再倒油',
+        detail: '油烧热后倒蛋液，用筷子快速划散',
+        tip: '热锅凉油是不粘锅的秘诀，而且鸡蛋会很蓬松',
+      },
+      {
+        action: '蛋液刚凝固就倒米饭',
+        detail: '大火快速翻炒，让每粒米都裹上蛋液',
+        tip: '这一步要大火快炒，翻锅要勤，米饭才会有镬气',
+      },
+      {
+        action: '加火腿丁继续翻炒',
+        detail: '炒个两分钟左右，让火腿的香味出来',
+        tip: '没有火腿可以放虾仁、培根、青菜丁都行',
+      },
+      {
+        action: '调味：加盐和少许白胡椒粉',
+        detail: '盐要撒均匀，别一下倒一坨',
+        tip: '加一点点白胡椒粉提香，吃的时候吃不出胡椒味但就是香',
+      },
+      {
+        action: '最后撒葱花翻两下出锅',
+        detail: '葱绿最后放，颜色翠绿好看，香味也足',
+        tip: '葱花分两次放，葱白和米饭一起炒出香，葱绿最后放配色',
+      },
+    ],
+    cookingTips: [
+      '米饭一定要用隔夜的，现煮的饭水分太大炒不出粒粒分明',
+      '米饭提前打散，别等下锅了再戳，那样容易结块',
+      '火候要大，翻炒要快，这是蛋炒饭有锅气的关键',
+      '盐要少放，不够可以加，咸了就救不回来了',
+    ],
+  },
+
+  '麻婆豆腐': {
+    emoji: '🌶',
+    intro: '麻辣鲜香，川菜经典',
+    difficulty: '中等',
+    cookTime: '20分钟',
+    ingredients: [
+      { item: '嫩豆腐', amount: '400g' },
+      { item: '牛肉末', amount: '100g' },
+      { item: '豆瓣酱', amount: '1勺' },
+      { item: '花椒粉', amount: '1小勺' },
+      { item: '蒜末', amount: '3瓣' },
+      { item: '葱花', amount: '适量' },
+      { item: '生抽', amount: '1勺' },
+      { item: '水淀粉', amount: '适量' },
+    ],
+    steps: [
+      {
+        action: '豆腐切成2厘米见方的小块',
+        detail: '加了盐的开水里焯1分钟，捞出泡在温水里',
+        tip: '焯水可以去豆腥，还能让豆腐不容易碎',
+      },
+      {
+        action: '热锅下油，放牛肉末煸炒',
+        detail: '小火慢慢炒，炒到肉末变色酥脆出香',
+        tip: '牛肉末要煸干一点才香，吃起来有颗粒感',
+      },
+      {
+        action: '加蒜末和豆瓣酱炒出红油',
+        detail: '小火慢炒，把豆瓣酱的香味炒出来',
+        tip: '豆瓣酱可以剁碎一点，口感更细腻',
+      },
+      {
+        action: '加适量清水或高汤',
+        detail: '烧开后放豆腐，轻轻推动锅，别用铲子乱翻',
+        tip: '推锅而不是铲，这样豆腐不容易碎',
+      },
+      {
+        action: '加生抽调味，小火煮3分钟',
+        detail: '让豆腐入味，期间偶尔推一推锅',
+        tip: '别煮太久，豆腐老了就不好吃了',
+      },
+      {
+        action: '分两次淋入水淀粉勾芡',
+        detail: '第一次勾完推匀，再加第二次，汤汁更浓稠',
+        tip: '分次勾芡比一次到位效果好，汤汁裹得更匀',
+      },
+      {
+        action: '出锅前撒花椒粉和葱花',
+        detail: '麻辣鲜香的麻婆豆腐就做好了',
+        tip: '花椒粉最后撒，麻味才足，提前放会挥发',
+      },
+    ],
+    cookingTips: [
+      '选嫩豆腐不要选老豆腐，嫩豆腐口感滑嫩才是那个味',
+      '豆腐焯完水别直接下锅，泡在温水里，温度差小不容易碎',
+      '烧豆腐要推锅不要铲，铲子一铲就碎了',
+      '花椒粉是麻味的关键，要用汉源花椒才正宗',
+    ],
+  },
+
+  '可乐鸡翅': {
+    emoji: '🥤',
+    intro: '甜香浓郁，零失败家常菜',
+    difficulty: '简单',
+    cookTime: '25分钟',
+    ingredients: [
+      { item: '鸡翅中', amount: '500g' },
+      { item: '可乐', amount: '1罐(330ml)' },
+      { item: '姜片', amount: '3片' },
+      { item: '葱段', amount: '2根' },
+      { item: '生抽', amount: '2勺' },
+      { item: '老抽', amount: '半勺' },
+      { item: '料酒', amount: '1勺' },
+    ],
+    steps: [
+      {
+        action: '鸡翅洗净，两面各划两刀',
+        detail: '划深一点，这样更容易入味',
+        tip: '别划太多，两三刀就够，划多了煮的时候容易碎',
+      },
+      {
+        action: '冷水下锅焯水',
+        detail: '加姜片和料酒，水开后煮2分钟捞出冲洗干净',
+        tip: '焯水可以去血沫和腥味，鸡翅更干净',
+      },
+      {
+        action: '平底锅小火煎鸡翅',
+        detail: '皮朝下先煎，煎到两面金黄就可以',
+        tip: '不用额外加油，鸡皮本身会出油，煎出来更香',
+      },
+      {
+        action: '加姜片葱段炒香',
+        detail: '倒一整罐可乐进去，基本没过鸡翅',
+        tip: '用普通可乐别用无糖的，无糖的熬出来发苦',
+      },
+      {
+        action: '加生抽老抽调色调',
+        detail: '生抽提鲜老抽调色，老抽少放点',
+        tip: '先少放老抽，颜色不够再加，放多了发黑',
+      },
+      {
+        action: '大火烧开转中小火炖',
+        detail: '炖15分钟左右，让鸡翅吸满可乐的甜味',
+        tip: '中途翻一次面，上色更均匀',
+      },
+      {
+        action: '开大火收汁',
+        detail: '汁变浓稠，亮亮的裹在鸡翅上就好了',
+        tip: '收汁的时候盯着点，别烧糊了，糊了就前功尽弃',
+      },
+    ],
+    cookingTips: [
+      '用普通含糖可乐，零度可乐做出来味道不对',
+      '煎鸡翅要小火慢煎，把鸡油煎出来才香',
+      '收汁一定要大火，汁才会亮，不然稀稀的挂不住',
+      '甜度不够可以加点冰糖，老抽千万别放多了',
+    ],
+  },
+
+  '葱油拌面': {
+    emoji: '🍜',
+    intro: '葱香四溢，简单温暖',
+    difficulty: '简单',
+    cookTime: '20分钟',
+    ingredients: [
+      { item: '细面条', amount: '200g' },
+      { item: '小葱', amount: '6根' },
+      { item: '食用油', amount: '80ml' },
+      { item: '生抽', amount: '3勺' },
+      { item: '老抽', amount: '1勺' },
+      { item: '白糖', amount: '1勺' },
+      { item: '白芝麻', amount: '少许' },
+    ],
+    steps: [
+      {
+        action: '小葱洗净切段，葱白葱绿分开',
+        detail: '葱白比较难炸，要先下锅',
+        tip: '葱要沥干水分，不然炸的时候油会溅',
+      },
+      {
+        action: '冷锅冷油下葱白',
+        detail: '开最小火慢慢熬，熬到葱白微黄',
+        tip: '一定要小火慢熬，火大了葱糊了发苦',
+      },
+      {
+        action: '加葱绿继续熬',
+        detail: '再熬个10分钟左右，直到葱变成深褐色的葱油酥',
+        tip: '熬到葱一碰就碎的程度，葱香才完全出来',
+      },
+      {
+        action: '过滤出葱油',
+        detail: '葱酥可以留着拌面吃，特别香',
+        tip: '过滤的时候别用滤网压，压了葱油会发苦',
+      },
+      {
+        action: '调酱汁：生抽、老抽、白糖混合',
+        detail: '搅拌到糖融化，咸甜平衡',
+        tip: '可以尝一下，不够甜加点糖，不够咸加点生抽',
+      },
+      {
+        action: '烧开水煮面条',
+        detail: '煮到八分熟捞出，过一下温水更Q弹',
+        tip: '面别煮太软，拌的时候还会吸水，太烂了不好吃',
+      },
+      {
+        action: '碗底放葱油和酱汁',
+        detail: '放面条，撒白芝麻和葱酥，趁热拌匀开吃',
+        tip: '一定要趁热拌，凉了油就凝固了拌不开',
+      },
+    ],
+    cookingTips: [
+      '葱油一次可以多熬点，放冰箱能存好久，吃的时候挖一勺',
+      '小火慢熬是关键，心急吃不了好葱油',
+      '面条选细的挂面或者鲜面都行，宽面没那么入味',
+      '糖和生抽的比例可以根据口味调，上海风味是偏甜的',
+    ],
+  },
+
+  '提拉米苏': {
+    emoji: '🍰',
+    intro: '经典意式甜品，层层惊喜',
+    difficulty: '中等',
+    cookTime: '30分钟+冷藏4小时',
+    ingredients: [
+      { item: '马斯卡彭奶酪', amount: '250g' },
+      { item: '手指饼干', amount: '200g' },
+      { item: '浓缩咖啡', amount: '150ml' },
+      { item: '淡奶油', amount: '200ml' },
+      { item: '蛋黄', amount: '3个' },
+      { item: '细砂糖', amount: '60g' },
+      { item: '可可粉', amount: '适量' },
+    ],
+    steps: [
+      {
+        action: '蛋黄加糖隔水加热打发',
+        detail: '坐热水打发到颜色变浅，体积变大，质地浓稠',
+        tip: '温度别太高，不然蛋黄熟了结块，大概60度左右',
+      },
+      {
+        action: '加马斯卡彭奶酪拌匀',
+        detail: '用刮刀翻拌，不要画圈搅拌，避免消泡',
+        tip: '奶酪提前拿出来回温，不然硬邦邦的拌不开',
+      },
+      {
+        action: '淡奶油打发到六分发',
+        detail: '有纹路但还会流动的状态，别打太硬',
+        tip: '淡奶油和容器都要冰的，夏天坐冰水里打',
+      },
+      {
+        action: '淡奶油和奶酪糊混合',
+        detail: '分两次混合，用翻拌的手法，动作要轻要快',
+        tip: '拌匀就行，别过度搅拌，不然会变稀',
+      },
+      {
+        action: '浓缩咖啡冷却，手指饼干快速蘸一下',
+        detail: '蘸一下就拿出来，泡久了饼干会烂掉',
+        tip: '喜欢酒味的可以在咖啡里加点朗姆酒或者咖啡酒',
+      },
+      {
+        action: '一层饼干一层奶酪糊交替铺',
+        detail: '铺两层，表面用刮刀抹平',
+        tip: '边角也要铺到，不然切的时候有空洞',
+      },
+      {
+        action: '冷藏4小时以上，吃前筛可可粉',
+        detail: '最好冷藏过夜，味道融合得更好',
+        tip: '可可粉要吃之前再筛，筛早了会受潮变丑',
+      },
+    ],
+    cookingTips: [
+      '马斯卡彭别用奶油奶酪代替，口感完全不一样',
+      '手指饼干蘸咖啡要快，蘸一下就够，泡软了就没口感了',
+      '一定要冷藏够时间，不然切的时候会散',
+      '可可粉用细筛子筛，均匀又好看',
+    ],
+  },
+
+  '蒜蓉西兰花': {
+    emoji: '🥦',
+    intro: '清爽健康，快手素菜',
+    difficulty: '简单',
+    cookTime: '10分钟',
+    ingredients: [
+      { item: '西兰花', amount: '1颗' },
+      { item: '大蒜', amount: '5瓣' },
+      { item: '盐', amount: '适量' },
+      { item: '蚝油', amount: '1勺' },
+      { item: '食用油', amount: '适量' },
+      { item: '水淀粉', amount: '少许' },
+    ],
+    steps: [
+      {
+        action: '西兰花掰成小朵，用淡盐水泡10分钟',
+        detail: '泡一泡可以把菜虫泡出来，吃着放心',
+        tip: '别切，用手掰，这样不会有碎渣子',
+      },
+      {
+        action: '烧开水，加一点盐和油',
+        detail: '西兰花下锅焯30秒到1分钟，捞出过凉水',
+        tip: '加油和盐是为了让西兰花颜色更绿，过凉水保持脆感',
+      },
+      {
+        action: '大蒜剁成蒜末',
+        detail: '尽量切细一点，蒜香味更足',
+        tip: '蒜要多，这道菜的灵魂就是蒜香',
+      },
+      {
+        action: '热锅下油，小火炒香蒜末',
+        detail: '炒到微微发黄就可以，别炒糊了',
+        tip: '小火慢炒才出香，大火一下就糊了发苦',
+      },
+      {
+        action: '倒入西兰花大火翻炒',
+        detail: '翻个十几下，让蒜香裹满西兰花',
+        tip: '大火快炒，保持西兰花的脆感',
+      },
+      {
+        action: '加蚝油和少许盐调味',
+        detail: '翻炒均匀，让每朵花都裹上酱汁',
+        tip: '蚝油本身有咸味，盐要少放',
+      },
+      {
+        action: '淋一点水淀粉勾薄芡出锅',
+        detail: '芡汁薄薄的就行，亮亮的好看',
+        tip: '不喜欢勾芡的可以省略，一样好吃',
+      },
+    ],
+    cookingTips: [
+      '西兰花焯水时间别太长，软塌塌的就不好吃了',
+      '过凉水这步很重要，能保持脆嫩和翠绿的颜色',
+      '蒜要多才香，这道菜全靠蒜提味',
+      '想更健康的可以少放油，或者直接白灼淋蒸鱼豉油',
+    ],
+  },
+};
+
+/* ==================== SHOT TYPES & LANGUAGE TEMPLATES ==================== */
+/* 景别和镜头语言模板 - 让脚本更专业 */
+const SHOT_TYPES = {
+  close: '特写',
+  medium: '中景',
+  near: '近景',
+  wide: '全景',
+  detail: '细节',
+  top: '俯视',
+};
+
+/* 不同风格的旁白模板 - 去AI化设计 */
+const NARRATOR_STYLES = {
+  home: {
+    intro: [
+      '今天咱们做个',
+      '哈喽，今天给大家分享一道',
+      '来了来了，今天做的是',
+      '朋友们，今天这道菜是',
+    ],
+    transition: [
+      '接下来啊，',
+      '然后呢，',
+      '下一步，',
+      '接着啊，',
+    ],
+    tipIntro: [
+      '这里跟大家说一下啊，',
+      '提醒一下各位，',
+      '有个小技巧跟你们说，',
+      '划重点了啊，',
+    ],
+    ending: [
+      '这样就做好了，是不是挺简单的',
+      '好了，搞定，你学会了吗',
+      '就是这么简单，赶紧试试吧',
+      '出锅啦，闻着都香',
+    ],
+    fillers: ['嗯', '啊', '对吧', '其实', '就是说'],
+  },
+  pro: {
+    intro: [
+      '今天我们来制作',
+      '本期视频为大家带来的是',
+      '欢迎来到本期教程，今天学习',
+    ],
+    transition: [
+      '接下来，',
+      '第二步，',
+      '随后，',
+      '紧接着，',
+    ],
+    tipIntro: [
+      '这里需要注意的是，',
+      '技术要点：',
+      '关键提示：',
+      '烹饪要点：',
+    ],
+    ending: [
+      '这样，一道美味的就完成了',
+      '成品展示，感谢观看',
+      '制作完成，你学会了吗',
+    ],
+    fillers: [],
+  },
+  vlog: {
+    intro: [
+      '嗨姐妹们！今天我又来做饭啦，今天做',
+      '今天的vlog是做饭日常，做的是',
+      '宝子们！今天这个真的绝了，是',
+      '欢迎来到我的厨房，今天搞个',
+    ],
+    transition: [
+      '然后哈，',
+      '接下来呢，',
+      '完了之后，',
+      '然后就是，',
+    ],
+    tipIntro: [
+      '跟你们说啊，',
+      '真的姐妹们，',
+      '我跟你们讲，',
+      '亲测有效啊，',
+    ],
+    ending: [
+      '哇塞太香了，我先开动啦',
+      '真的巨好吃！你们一定要试试',
+      '搞定！简简单单又一餐',
+      '绝了绝了，这个味道真的可以',
+    ],
+    fillers: ['真的', '超级', '巨', '绝了', '咱就是说'],
+  },
+};
+
+/* ==================== SCRIPT GENERATION ==================== */
+/* 生成视频脚本的核心逻辑 */
+
+function generateScript(dishName, duration, style, includeTips, includeCookingTips) {
+  const recipe = RECIPE_DATABASE[dishName];
+  if (!recipe) return null;
+
+  const styleConfig = NARRATOR_STYLES[style] || NARRATOR_STYLES.home;
+  const totalSteps = recipe.steps.length;
+  
+  // 计算各部分时长分配
+  const coverDuration = Math.max(3, Math.round(duration * 0.1));
+  const ingredientsDuration = Math.max(3, Math.round(duration * 0.08));
+  const endingDuration = Math.max(3, Math.round(duration * 0.1));
+  const remainingTime = duration - coverDuration - ingredientsDuration - endingDuration;
+  const perStepDuration = Math.max(2, Math.floor(remainingTime / totalSteps));
+
+  const shots = [];
+  let shotNum = 1;
+
+  // ===== 开场镜头 =====
+  shots.push({
+    scene: '开场',
+    num: shotNum++,
+    type: SHOT_TYPES.close,
+    visual: `成品展示 - ${dishName}${recipe.emoji}的诱人特写，热气腾腾，色泽诱人`,
+    audio: pickRandom(styleConfig.intro) + `${dishName}。${recipe.intro}，咱们这就开始！`,
+    duration: coverDuration,
+    note: includeTips ? '建议用慢动作展示热气腾腾的效果，暖光打在食物上更有食欲' : '',
+  });
+
+  // ===== 食材展示 =====
+  const ingredientsText = recipe.ingredients.map(i => `${i.item} ${i.amount}`).join('、');
+  shots.push({
+    scene: '食材',
+    num: shotNum++,
+    type: SHOT_TYPES.top,
+    visual: `食材平铺展示 - ${ingredientsText}，整齐摆放在料理台上`,
+    audio: `食材很简单，就这些：${recipe.ingredients.slice(0, 5).map(i => i.item).join('、')}${recipe.ingredients.length > 5 ? '等等' : ''}。`,
+    duration: ingredientsDuration,
+    note: includeTips ? '俯视角度拍摄，食材分类摆放，画面干净清爽' : '',
+  });
+
+  // ===== 烹饪步骤 =====
+  recipe.steps.forEach((step, idx) => {
+    const stepDuration = perStepDuration + (idx === recipe.steps.length - 1 ? 1 : 0);
+    
+    // 主镜头
+    shots.push({
+      scene: `步骤${idx + 1}`,
+      num: shotNum++,
+      type: pickShotType(idx),
+      visual: step.action,
+      audio: generateStepNarration(step, idx, totalSteps, styleConfig),
+      duration: stepDuration,
+      note: includeTips ? step.tip : '',
+    });
+
+    // 关键步骤加一个细节特写镜头（有tip的步骤）
+    if (step.tip && includeTips && stepDuration >= 4) {
+      shots.push({
+        scene: `步骤${idx + 1}细节`,
+        num: shotNum++,
+        type: SHOT_TYPES.detail,
+        visual: `${step.detail}`,
+        audio: generateTipNarration(step.tip, styleConfig),
+        duration: Math.max(2, Math.floor(stepDuration * 0.5)),
+        note: '',
+      });
+    }
+  });
+
+  // ===== 结尾镜头 =====
+  shots.push({
+    scene: '结尾',
+    num: shotNum++,
+    type: SHOT_TYPES.medium,
+    visual: `成品摆盘展示 - 做好的${dishName}，配上装饰，角度缓慢旋转展示`,
+    audio: pickRandom(styleConfig.ending) + `${dishName}就做好啦，趁热吃最香！`,
+    duration: endingDuration,
+    note: includeTips ? '360度环绕拍摄，配上暖光，突出食物的质感和色泽' : '',
+  });
+
+  // 总时长
+  const totalCalcDuration = shots.reduce((sum, s) => sum + s.duration, 0);
+
+  return {
+    dishName,
+    emoji: recipe.emoji,
+    intro: recipe.intro,
+    difficulty: recipe.difficulty,
+    cookTime: recipe.cookTime,
+    totalDuration: totalCalcDuration,
+    shotCount: shots.length,
+    ingredients: recipe.ingredients,
+    shots,
+    cookingTips: includeCookingTips ? recipe.cookingTips : [],
+    style,
+  };
+}
+
+function pickRandom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function pickShotType(stepIdx) {
+  const types = [SHOT_TYPES.medium, SHOT_TYPES.close, SHOT_TYPES.near, SHOT_TYPES.detail, SHOT_TYPES.top];
+  return types[stepIdx % types.length];
+}
+
+function generateStepNarration(step, idx, total, styleConfig) {
+  const ordinalWords = ['首先', '然后', '接着', '下一步', '之后', '随后', '最后'];
+  const ordinal = ordinalWords[idx] || `第${idx + 1}步`;
+  
+  let narration = `${ordinal}，${step.action}。`;
+  
+  // 适度加入口语化表达（去AI化）
+  if (styleConfig.fillers.length > 0 && Math.random() > 0.6) {
+    const filler = pickRandom(styleConfig.fillers);
+    if (Math.random() > 0.5) {
+      narration = filler + narration;
+    }
+  }
+  
+  return narration;
+}
+
+function generateTipNarration(tip, styleConfig) {
+  return pickRandom(styleConfig.tipIntro) + tip;
+}
+
+/* ==================== RENDER SCRIPT ==================== */
+function renderScript(script) {
+  let html = '';
+  
+  // 头部信息
+  html += `
+    <div class="script-output">
+      <div class="script-header">
+        <h2>${script.emoji} ${script.dishName} · 视频脚本</h2>
+        <div class="meta">
+          <span>⏱ 约 ${script.totalDuration} 秒</span>
+          <span>🎬 ${script.shotCount} 个镜头</span>
+          <span>📊 难度：${script.difficulty}</span>
+          <span>🍳 烹饪时间：${script.cookTime}</span>
+        </div>
+      </div>
+  `;
+
+  // 食材清单
+  html += `
+    <div class="scene-divider">🧺 食材清单</div>
+    <div style="padding: 12px 16px; font-size: 13px; color: var(--text-soft);">
+      ${script.ingredients.map(i => `● ${i.item} <span style="float: right; color: var(--brand-dark);">${i.amount}</span>`).join('<br>')}
+    </div>
+  `;
+
+  // 分镜表
+  html += `
+    <div class="scene-divider">🎬 分镜脚本</div>
+    <div style="overflow-x: auto;">
+      <table class="script-table">
+        <thead>
+          <tr>
+            <th style="text-align:center;">镜号</th>
+            <th>景别</th>
+            <th>画面内容</th>
+            <th>台词/旁白</th>
+            <th style="text-align:center;">时长</th>
+          </tr>
+        </thead>
+        <tbody>
+  `;
+
+  script.shots.forEach(shot => {
+    const noteHtml = shot.note ? `<div class="note">💡 ${shot.note}</div>` : '';
+    html += `
+      <tr>
+        <td class="shot-num">${shot.num}</td>
+        <td class="shot-type">${shot.type}</td>
+        <td class="visual">${shot.visual}${noteHtml}</td>
+        <td class="audio">"${shot.audio}"</td>
+        <td class="duration">${shot.duration}s</td>
+      </tr>
+    `;
+  });
+
+  html += `
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  // 烹饪小贴士
+  if (script.cookingTips && script.cookingTips.length > 0) {
+    html += `
+      <div class="tips-section">
+        <div class="tips-title">💡 烹饪小贴士</div>
+        <ul class="tips-list">
+          ${script.cookingTips.map(t => `<li>${t}</li>`).join('')}
+        </ul>
+      </div>
+    `;
+  }
+
+  html += `</div>`;
+
+  return html;
+}
+
+/* ==================== EXPORT FUNCTIONS ==================== */
+function scriptToText(script) {
+  let text = '';
+  text += `${script.emoji} ${script.dishName} · 美食视频脚本\n`;
+  text += `═══════════════════════════════════\n\n`;
+  text += `【基本信息】\n`;
+  text += `  菜品名称：${script.dishName}\n`;
+  text += `  视频时长：约 ${script.totalDuration} 秒\n`;
+  text += `  镜头数量：${script.shotCount} 个\n`;
+  text += `  烹饪难度：${script.difficulty}\n`;
+  text += `  烹饪时间：${script.cookTime}\n\n`;
+  
+  text += `【食材清单】\n`;
+  script.ingredients.forEach(i => {
+    text += `  ● ${i.item}：${i.amount}\n`;
+  });
+  text += `\n`;
+  
+  text += `【分镜脚本】\n`;
+  text += `───────────────────────────────────\n`;
+  
+  let currentScene = '';
+  script.shots.forEach(shot => {
+    if (shot.scene !== currentScene) {
+      text += `\n【${shot.scene}】\n`;
+      currentScene = shot.scene;
+    }
+    text += `  镜头 ${shot.num} | ${shot.type} | ${shot.duration}秒\n`;
+    text += `  ▶ 画面：${shot.visual}\n`;
+    text += `  ▶ 旁白：${shot.audio}\n`;
+    if (shot.note) {
+      text += `  💡 备注：${shot.note}\n`;
+    }
+    text += `\n`;
+  });
+  
+  if (script.cookingTips && script.cookingTips.length > 0) {
+    text += `\n【烹饪小贴士】\n`;
+    script.cookingTips.forEach((t, i) => {
+      text += `  ${i + 1}. ${t}\n`;
+    });
+  }
+  
+  text += `\n═══════════════════════════════════\n`;
+  text += `脚本由美食视频脚本生成器生成\n`;
+  
+  return text;
+}
+
+/* ==================== UI INTERACTIONS ==================== */
+const $ = id => document.getElementById(id);
+
+function showToast(msg, duration = 2000) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
+
+function showLoading(status = '正在生成...') {
+  $('loading-status').textContent = status;
+  $('loading').style.display = 'flex';
+}
+
+function hideLoading() {
+  $('loading').style.display = 'none';
+}
+
+// 建议标签点击
+document.querySelectorAll('.suggestion-tag').forEach(tag => {
+  tag.addEventListener('click', () => {
+    const dish = tag.dataset.dish;
+    $('dish-input').value = dish;
+    state.dish = dish;
+  });
+});
+
+// 时长选择
+document.querySelectorAll('#duration-chips .chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('#duration-chips .chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    state.duration = parseInt(chip.dataset.duration);
+  });
+});
+
+// 风格选择
+document.querySelectorAll('#style-chips .chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('#style-chips .chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    state.style = chip.dataset.style;
+  });
+});
+
+// 输入框
+$('dish-input').addEventListener('input', e => {
+  state.dish = e.target.value.trim();
+});
+
+// 生成按钮
+$('btn-generate').addEventListener('click', () => {
+  const dish = $('dish-input').value.trim();
+  if (!dish) {
+    showToast('请输入菜品名称');
+    return;
+  }
+  
+  state.dish = dish;
+  state.includeTips = $('opt-tips').checked;
+  state.includeCookingTips = $('opt-cooking-tips').checked;
+  
+  // 模拟生成过程（有真实数据不需要真的生成，但加个loading体验更好）
+  showLoading('正在构思分镜...');
+  
+  const loadingSteps = ['分析菜谱结构', '设计镜头语言', '撰写旁白文案', '优化节奏时长'];
+  let stepIdx = 0;
+  const loadingInterval = setInterval(() => {
+    stepIdx++;
+    if (stepIdx < loadingSteps.length) {
+      $('loading-status').textContent = loadingSteps[stepIdx];
+    }
+  }, 300);
+  
+  setTimeout(() => {
+    clearInterval(loadingInterval);
+    hideLoading();
+    
+    const script = generateScript(
+      state.dish,
+      state.duration,
+      state.style,
+      state.includeTips,
+      state.includeCookingTips
+    );
+    
+    if (!script) {
+      $('output-section').style.display = 'none';
+      $('empty-state').style.display = 'block';
+      $('input-section').style.display = 'none';
+      showToast('暂无该菜品的脚本模板');
+      return;
+    }
+    
+    state.currentScript = script;
+    $('script-content').innerHTML = renderScript(script);
+    $('input-section').style.display = 'none';
+    $('output-section').style.display = 'block';
+    $('empty-state').style.display = 'none';
+    window.scrollTo(0, 0);
+    showToast('脚本生成完成！');
+  }, 1200);
+});
+
+// 返回按钮
+$('btn-back').addEventListener('click', () => {
+  $('output-section').style.display = 'none';
+  $('input-section').style.display = 'block';
+  $('empty-state').style.display = 'none';
+  window.scrollTo(0, 0);
+});
+
+// 复制脚本
+$('btn-copy').addEventListener('click', () => {
+  if (!state.currentScript) return;
+  const text = scriptToText(state.currentScript);
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('脚本已复制到剪贴板 ✓');
+  }).catch(() => {
+    // 降级方案
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    showToast('脚本已复制 ✓');
+  });
+});
+
+// 导出 TXT
+$('btn-export').addEventListener('click', () => {
+  if (!state.currentScript) return;
+  const text = scriptToText(state.currentScript);
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${state.currentScript.dishName}-视频脚本.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('脚本已导出 ✓');
+});
+
+console.log('🎬 美食视频脚本生成器已加载');
+</script>
+</body>
+</html>
