@@ -2148,54 +2148,76 @@ function drawIngredientsScene(cx, script, t, duration) {
   cx.restore();
 }
 
-/* 绘制步骤场景 */
+/* 烹饪动作图标映射 */
+const COOKING_ICONS = {
+  '切': '🔪', '切丁': '🔪', '切块': '🔪', '切片': '🔪', '切丝': '🔪',
+  '炒': '🍳', '翻炒': '🍳', '煸炒': '🍳', '煎': '🍳', '爆': '🍳',
+  '煮': '🍲', '焯水': '🫕', '炖': '🍲', '熬': '🍲', '焖': '🍲',
+  '蒸': '🥘', '烤': '🔥', '炸': '🍤',
+  '调味': '🧂', '加盐': '🧂', '加酱油': '🧂', '加糖': '🧂', '加料酒': '🧂',
+  '放': '🥄', '倒入': '🥄', '加入': '🥄', '添': '🥄',
+  '拌': '🥢', '搅拌': '🥢', '混匀': '🥢', '裹': '🥢',
+  '收汁': '✨', '勾芡': '✨', '出锅': '🍽️', '装盘': '🍽️',
+  '洗': '💧', '泡': '💧', '腌': '🧴', '准备': '📋',
+  '食材': '🧺', '材料': '🧺', '备料': '🧺',
+};
+
+/* 根据步骤描述获取对应图标 */
+function getCookingIcon(text) {
+  for (const [keyword, icon] of Object.entries(COOKING_ICONS)) {
+    if (text.includes(keyword)) return icon;
+  }
+  return '🍳';
+}
+
+/* 绘制步骤场景 - 图文同步版 */
 function drawStepScene(cx, script, shot, t, duration, img) {
   cx.clearRect(0, 0, VW, VH);
   
   if (img) {
     drawKenBurns(cx, img, t, duration);
+    cx.fillStyle = 'rgba(0,0,0,0.5)';
+    cx.fillRect(0, 0, VW, VH);
   } else {
+    const hueBase = (shot.num * 35) % 360;
     const bgGrad = cx.createLinearGradient(0, 0, 0, VH);
-    bgGrad.addColorStop(0, '#fff5ee');
-    bgGrad.addColorStop(0.5, '#ffe8d6');
-    bgGrad.addColorStop(1, '#ffd4b8');
+    bgGrad.addColorStop(0, `hsl(${hueBase}, 80%, 95%)`);
+    bgGrad.addColorStop(0.5, `hsl(${hueBase + 15}, 75%, 90%)`);
+    bgGrad.addColorStop(1, `hsl(${hueBase + 30}, 70%, 82%)`);
     cx.fillStyle = bgGrad;
     cx.fillRect(0, 0, VW, VH);
     
-    const emoji = script.emoji || '🍳';
-    cx.font = '160px sans-serif';
+    const icon = getCookingIcon(shot.visual || shot.scene || '');
+    cx.font = '140px sans-serif';
     cx.textAlign = 'center';
     cx.textBaseline = 'middle';
-    cx.globalAlpha = 0.15;
-    const floatY = Math.sin(t * 1.5) * 10;
-    cx.fillText(emoji, VW/2, VH*0.35 + floatY);
+    cx.globalAlpha = 0.12;
+    const floatY = Math.sin(t * 2) * 8;
+    cx.fillText(icon, VW/2, VH*0.3 + floatY);
     cx.globalAlpha = 1;
-    
-    cx.fillStyle = '#ff6b35';
-    cx.font = '700 20px -apple-system,"PingFang SC",sans-serif';
-    cx.textAlign = 'center';
-    cx.fillText(script.dishName, VW/2, 70);
   }
+  
+  const fadeIn = Math.min(t / 0.4, 1);
+  const progress = Math.min(t / duration, 1);
+  
+  // 顶部步骤信息条
+  const barH = 70;
+  cx.save();
+  cx.globalAlpha = fadeIn;
   
   if (!img) {
-    cx.fillStyle = 'rgba(255,255,255,0.85)';
-    cx.fillRect(0, VH*0.5, VW, VH*0.5);
-  } else {
-    cx.fillStyle = 'rgba(0,0,0,0.55)';
-    cx.fillRect(0, VH*0.55, VW, VH*0.45);
-    const topGrad = cx.createLinearGradient(0, VH*0.45, 0, VH*0.58);
-    topGrad.addColorStop(0, 'rgba(0,0,0,0)');
-    topGrad.addColorStop(1, 'rgba(0,0,0,0.5)');
+    const topGrad = cx.createLinearGradient(0, 0, 0, barH);
+    topGrad.addColorStop(0, 'rgba(255,255,255,0.9)');
+    topGrad.addColorStop(1, 'rgba(255,255,255,0.7)');
     cx.fillStyle = topGrad;
-    cx.fillRect(0, VH*0.45, VW, VH*0.13);
+    cx.fillRect(0, 0, VW, barH);
+  } else {
+    cx.fillStyle = 'rgba(0,0,0,0.4)';
+    cx.fillRect(0, 0, VW, barH);
   }
   
-  // 步骤徽章
-  const badgeR = 28, badgeX = 50, badgeY = img ? 70 : VH*0.55;
-  cx.save();
-  cx.shadowColor = img ? 'rgba(0,0,0,0.5)' : 'rgba(255,107,53,0.3)';
-  cx.shadowBlur = 16;
-  cx.shadowOffsetY = 4;
+  // 步骤编号徽章
+  const badgeR = 22, badgeX = 40, badgeY = barH/2;
   cx.beginPath();
   cx.arc(badgeX, badgeY, badgeR, 0, Math.PI * 2);
   const badgeGrad = cx.createLinearGradient(0, badgeY - badgeR, 0, badgeY + badgeR);
@@ -2203,54 +2225,134 @@ function drawStepScene(cx, script, shot, t, duration, img) {
   badgeGrad.addColorStop(1, '#e85a24');
   cx.fillStyle = badgeGrad;
   cx.fill();
-  cx.shadowBlur = 0;
-  cx.shadowOffsetY = 0;
-  cx.font = '800 24px -apple-system,"PingFang SC",sans-serif';
-  cx.fillStyle = '#ffffff';
+  cx.font = '800 20px -apple-system,"PingFang SC",sans-serif';
+  cx.fillStyle = '#fff';
   cx.textAlign = 'center';
   cx.textBaseline = 'middle';
-  cx.fillText(shot.num.toString(), badgeX, badgeY - 2);
+  cx.fillText(shot.num.toString(), badgeX, badgeY - 1);
   
-  // 步骤标签
-  cx.font = '700 18px -apple-system,"PingFang SC",sans-serif';
-  cx.fillStyle = img ? '#ffffff' : '#2c1810';
+  // 步骤名称
+  cx.font = '700 17px -apple-system,"PingFang SC",sans-serif';
+  cx.fillStyle = img ? '#fff' : '#2c1810';
   cx.textAlign = 'left';
-  cx.shadowColor = img ? 'rgba(0,0,0,0.6)' : 'transparent';
-  cx.shadowBlur = img ? 6 : 0;
-  cx.fillText(`${shot.scene}`, badgeX + badgeR + 14, badgeY - 2);
-  cx.shadowBlur = 0;
+  cx.textBaseline = 'middle';
+  const stepName = shot.scene || `步骤${shot.num}`;
+  cx.fillText(stepName, badgeX + badgeR + 12, badgeY - 1);
+  
+  // 进度条
+  const progressBarY = barH - 4;
+  cx.fillStyle = img ? 'rgba(255,255,255,0.2)' : 'rgba(255,107,53,0.2)';
+  cx.fillRect(0, progressBarY, VW, 3);
+  cx.fillStyle = '#ff6b35';
+  cx.fillRect(0, progressBarY, VW * progress, 3);
+  
   cx.restore();
   
-  // 解说文字卡片
-  const cardH = 160, cardY = VH - cardH - 20, cardX = 20, cardW = VW - 40;
-  cx.save();
+  // 中部 - 核心内容区
+  const contentTop = barH + 20;
+  const contentBottom = VH - 170;
+  const contentH = contentBottom - contentTop;
   
-  drawRoundRect(cx, cardX, cardY, cardW, cardH, 14);
+  cx.save();
+  cx.globalAlpha = fadeIn;
+  
+  if (!img) {
+    const mainIcon = getCookingIcon(shot.visual || shot.narration || '');
+    const iconSize = 80;
+    cx.font = `${iconSize}px sans-serif`;
+    cx.textAlign = 'center';
+    cx.textBaseline = 'middle';
+    const iconY = contentTop + contentH * 0.35;
+    const iconBounce = Math.sin(t * 3) * 5;
+    cx.shadowColor = 'rgba(255,107,53,0.3)';
+    cx.shadowBlur = 20;
+    cx.fillText(mainIcon, VW/2, iconY + iconBounce);
+    cx.shadowBlur = 0;
+  }
+  
+  const descText = shot.visual || shot.scene || '';
+  const cleanDesc = descText.replace(/💡.*$/, '').trim();
+  
+  if (cleanDesc) {
+    const maxW = VW - 60;
+    const fontSize = 18;
+    const lineH = 28;
+    const lines = wrapTextLines(cx, cleanDesc, maxW, fontSize, lineH);
+    
+    const textY = img ? VH*0.45 : contentTop + contentH * 0.65;
+    const totalH = lines.length * lineH;
+    const startY = textY - totalH / 2;
+    
+    cx.textAlign = 'center';
+    cx.textBaseline = 'top';
+    
+    const linesVisible = Math.ceil(progress * lines.length);
+    
+    lines.slice(0, linesVisible).forEach((line, i) => {
+      const lineProgress = Math.max(0, Math.min(1, (progress * lines.length - i) * 3));
+      cx.globalAlpha = fadeIn * lineProgress;
+      cx.font = `600 ${fontSize}px -apple-system,"PingFang SC",sans-serif`;
+      cx.fillStyle = img ? '#fff' : '#2c1810';
+      cx.shadowColor = img ? 'rgba(0,0,0,0.8)' : 'transparent';
+      cx.shadowBlur = img ? 8 : 0;
+      cx.fillText(line, VW/2, startY + i * lineH);
+    });
+  }
+  
+  cx.restore();
+  
+  // 底部 - 解说字幕卡片
+  const cardH = 140, cardY = VH - cardH - 16, cardX = 16, cardW = VW - 32;
+  
+  cx.save();
+  const cardFadeIn = Math.min(t / 0.6, 1);
+  cx.globalAlpha = cardFadeIn;
+  
+  drawRoundRect(cx, cardX, cardY, cardW, cardH, 16);
   const cardGrad = cx.createLinearGradient(0, cardY, 0, cardY + cardH);
-  cardGrad.addColorStop(0, 'rgba(255,252,248,0.97)');
-  cardGrad.addColorStop(1, 'rgba(255,240,228,0.97)');
+  cardGrad.addColorStop(0, 'rgba(255,252,248,0.98)');
+  cardGrad.addColorStop(1, 'rgba(255,240,228,0.98)');
   cx.fillStyle = cardGrad;
   cx.fill();
   
-  // 顶部装饰条
+  // 卡片顶部装饰条
   drawRoundRect(cx, cardX, cardY, cardW, 4, 2);
   cx.fillStyle = '#ff6b35';
   cx.fill();
   
-  // 文字
-  const text = shot.audio.replace(/"/g, '');
-  const lines = wrapTextLines(cx, text, cardW - 40, 17, 28);
-  const totalH = lines.length * 28;
-  const startY = cardY + cardH / 2 - totalH / 2 + 14;
-  
-  cx.textAlign = 'center';
-  cx.textBaseline = 'middle';
-  
-  lines.slice(0, 4).forEach((line, i) => {
-    cx.font = `600 17px -apple-system,"PingFang SC",sans-serif`;
-    cx.fillStyle = '#2c1810';
-    cx.fillText(line, VW/2, startY + i * 28);
-  });
+  // 解说文字
+  const narration = shot.audio ? shot.audio.replace(/"/g, '') : '';
+  if (narration) {
+    const narrMaxW = cardW - 40;
+    const narrFontSize = 16;
+    const narrLineH = 26;
+    const narrLines = wrapTextLines(cx, narration, narrMaxW, narrFontSize, narrLineH);
+    
+    const narrTotalH = narrLines.length * narrLineH;
+    const narrStartY = cardY + cardH/2 - narrTotalH/2 + 8;
+    
+    cx.textAlign = 'center';
+    cx.textBaseline = 'top';
+    
+    const narrProgress = Math.min(t / (duration * 0.8), 1);
+    const totalChars = narration.length;
+    let charsShown = Math.floor(totalChars * narrProgress);
+    
+    let charCount = 0;
+    narrLines.forEach((line, i) => {
+      if (charCount >= charsShown) return;
+      const lineChars = Math.min(line.length, charsShown - charCount);
+      const displayLine = line.substring(0, lineChars);
+      
+      cx.font = `500 ${narrFontSize}px -apple-system,"PingFang SC",sans-serif`;
+      cx.fillStyle = '#2c1810';
+      cx.shadowBlur = 0;
+      cx.globalAlpha = cardFadeIn;
+      cx.fillText(displayLine, VW/2, narrStartY + i * narrLineH);
+      
+      charCount += line.length;
+    });
+  }
   
   cx.restore();
   
