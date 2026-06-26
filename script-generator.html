@@ -2148,26 +2148,839 @@ function drawIngredientsScene(cx, script, t, duration) {
   cx.restore();
 }
 
-/* 烹饪动作图标映射 */
-const COOKING_ICONS = {
-  '切': '🔪', '切丁': '🔪', '切块': '🔪', '切片': '🔪', '切丝': '🔪',
-  '炒': '🍳', '翻炒': '🍳', '煸炒': '🍳', '煎': '🍳', '爆': '🍳',
-  '煮': '🍲', '焯水': '🫕', '炖': '🍲', '熬': '🍲', '焖': '🍲',
-  '蒸': '🥘', '烤': '🔥', '炸': '🍤',
-  '调味': '🧂', '加盐': '🧂', '加酱油': '🧂', '加糖': '🧂', '加料酒': '🧂',
-  '放': '🥄', '倒入': '🥄', '加入': '🥄', '添': '🥄',
-  '拌': '🥢', '搅拌': '🥢', '混匀': '🥢', '裹': '🥢',
-  '收汁': '✨', '勾芡': '✨', '出锅': '🍽️', '装盘': '🍽️',
-  '洗': '💧', '泡': '💧', '腌': '🧴', '准备': '📋',
-  '食材': '🧺', '材料': '🧺', '备料': '🧺',
+/* ========================================
+   烹饪图案素材库 - Canvas绘制真实插画
+   ======================================== */
+
+/* 图案绘制器对象 */
+const PatternDrawer = {
+  /* 绘制切菜图案 */
+  drawCut(cctx, cx, cy, size, color) {
+    cctx.save();
+    cctx.translate(cx, cy);
+    const s = size / 100;
+    
+    // 砧板
+    cctx.fillStyle = '#deb887';
+    cctx.beginPath();
+    cctx.roundRect(-40*s, -20*s, 80*s, 50*s, 4*s);
+    cctx.fill();
+    cctx.strokeStyle = '#8b7355';
+    cctx.lineWidth = 2*s;
+    cctx.stroke();
+    
+    // 木纹
+    cctx.strokeStyle = '#c9a86c';
+    cctx.lineWidth = 1*s;
+    for (let i = 0; i < 5; i++) {
+      cctx.beginPath();
+      cctx.moveTo(-38*s, -10*s + i*10*s);
+      cctx.lineTo(38*s, -10*s + i*10*s);
+      cctx.stroke();
+    }
+    
+    // 肉块
+    cctx.fillStyle = '#ff6b6b';
+    cctx.beginPath();
+    cctx.roundRect(-25*s, -15*s, 30*s, 30*s, 3*s);
+    cctx.fill();
+    cctx.fillStyle = 'rgba(255,255,255,0.3)';
+    cctx.fillRect(-25*s, -15*s, 30*s, 8*s);
+    
+    // 刀子
+    cctx.fillStyle = '#c0c0c0';
+    cctx.beginPath();
+    cctx.moveTo(10*s, -30*s);
+    cctx.lineTo(20*s, -30*s);
+    cctx.lineTo(22*s, 15*s);
+    cctx.lineTo(15*s, 20*s);
+    cctx.lineTo(10*s, 15*s);
+    cctx.closePath();
+    cctx.fill();
+    cctx.strokeStyle = '#808080';
+    cctx.lineWidth = 1*s;
+    cctx.stroke();
+    
+    // 刀柄
+    cctx.fillStyle = '#4a3728';
+    cctx.beginPath();
+    cctx.roundRect(15*s, 15*s, 8*s, 20*s, 2*s);
+    cctx.fill();
+    
+    cctx.restore();
+  },
+  
+  /* 绘制炒菜图案 */
+  drawStirfry(cctx, cx, cy, size, color) {
+    cctx.save();
+    cctx.translate(cx, cy);
+    const s = size / 100;
+    
+    // 炒锅
+    cctx.fillStyle = '#2c2c2c';
+    cctx.beginPath();
+    cctx.ellipse(0, 15*s, 40*s, 15*s, 0, 0, Math.PI);
+    cctx.arc(0, 15*s, 40*s, Math.PI, 0, true);
+    cctx.fill();
+    
+    // 锅底
+    cctx.fillStyle = '#1a1a1a';
+    cctx.beginPath();
+    cctx.ellipse(0, 15*s, 40*s, 12*s, 0, 0, Math.PI);
+    cctx.fill();
+    
+    // 食物
+    cctx.fillStyle = '#ff8c42';
+    cctx.beginPath();
+    cctx.ellipse(-15*s, 5*s, 12*s, 8*s, 0.3, 0, Math.PI*2);
+    cctx.fill();
+    cctx.beginPath();
+    cctx.ellipse(10*s, 0, 10*s, 7*s, -0.2, 0, Math.PI*2);
+    cctx.fill();
+    cctx.beginPath();
+    cctx.ellipse(-5*s, 10*s, 8*s, 6*s, 0.5, 0, Math.PI*2);
+    cctx.fill();
+    
+    // 锅铲
+    cctx.save();
+    cctx.translate(25*s, -10*s);
+    cctx.rotate(-0.4);
+    cctx.fillStyle = '#c0c0c0';
+    cctx.beginPath();
+    cctx.moveTo(0, 0);
+    cctx.lineTo(5*s, 0);
+    cctx.lineTo(8*s, 30*s);
+    cctx.lineTo(-8*s, 30*s);
+    cctx.lineTo(-5*s, 0);
+    cctx.closePath();
+    cctx.fill();
+    cctx.strokeStyle = '#808080';
+    cctx.lineWidth = 1*s;
+    cctx.stroke();
+    // 铲柄
+    cctx.fillStyle = '#4a3728';
+    cctx.fillRect(-3*s, 30*s, 6*s, 35*s);
+    cctx.restore();
+    
+    // 蒸汽
+    cctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    cctx.lineWidth = 2*s;
+    cctx.lineCap = 'round';
+    cctx.beginPath();
+    cctx.moveTo(-20*s, -20*s);
+    cctx.quadraticCurveTo(-15*s, -35*s, -20*s, -45*s);
+    cctx.stroke();
+    cctx.beginPath();
+    cctx.moveTo(0, -15*s);
+    cctx.quadraticCurveTo(5*s, -30*s, 0, -40*s);
+    cctx.stroke();
+    cctx.beginPath();
+    cctx.moveTo(20*s, -20*s);
+    cctx.quadraticCurveTo(25*s, -35*s, 20*s, -45*s);
+    cctx.stroke();
+    
+    cctx.restore();
+  },
+  
+  /* 绘制煮汤图案 */
+  drawBoil(cctx, cx, cy, size, color) {
+    cctx.save();
+    cctx.translate(cx, cy);
+    const s = size / 100;
+    
+    // 锅
+    cctx.fillStyle = '#d4d4d4';
+    cctx.beginPath();
+    cctx.moveTo(-40*s, -30*s);
+    cctx.lineTo(-35*s, 20*s);
+    cctx.quadraticCurveTo(0, 30*s, 35*s, 20*s);
+    cctx.lineTo(40*s, -30*s);
+    cctx.quadraticCurveTo(0, -40*s, -40*s, -30*s);
+    cctx.fill();
+    cctx.strokeStyle = '#a0a0a0';
+    cctx.lineWidth = 2*s;
+    cctx.stroke();
+    
+    // 锅沿
+    cctx.fillStyle = '#c0c0c0';
+    cctx.beginPath();
+    cctx.ellipse(0, -30*s, 40*s, 10*s, 0, 0, Math.PI*2);
+    cctx.fill();
+    cctx.strokeStyle = '#909090';
+    cctx.lineWidth = 1*s;
+    cctx.stroke();
+    
+    // 汤面
+    cctx.fillStyle = '#ffdb99';
+    cctx.beginPath();
+    cctx.ellipse(0, -25*s, 35*s, 8*s, 0, 0, Math.PI*2);
+    cctx.fill();
+    
+    // 食材
+    cctx.fillStyle = '#8b4513';
+    cctx.beginPath();
+    cctx.ellipse(-15*s, -20*s, 10*s, 6*s, 0.3, 0, Math.PI*2);
+    cctx.fill();
+    cctx.fillStyle = '#228b22';
+    cctx.beginPath();
+    cctx.ellipse(15*s, -22*s, 8*s, 5*s, -0.2, 0, Math.PI*2);
+    cctx.fill();
+    
+    // 气泡
+    cctx.fillStyle = 'rgba(255,255,255,0.6)';
+    cctx.beginPath();
+    cctx.arc(-10*s, -5*s, 4*s, 0, Math.PI*2);
+    cctx.arc(8*s, 0, 3*s, 0, Math.PI*2);
+    cctx.arc(0, -10*s, 5*s, 0, Math.PI*2);
+    cctx.fill();
+    
+    // 蒸汽
+    cctx.strokeStyle = 'rgba(255,255,255,0.4)';
+    cctx.lineWidth = 2*s;
+    cctx.lineCap = 'round';
+    cctx.beginPath();
+    cctx.moveTo(-25*s, -50*s);
+    cctx.quadraticCurveTo(-30*s, -65*s, -25*s, -75*s);
+    cctx.stroke();
+    cctx.beginPath();
+    cctx.moveTo(25*s, -50*s);
+    cctx.quadraticCurveTo(30*s, -65*s, 25*s, -75*s);
+    cctx.stroke();
+    
+    cctx.restore();
+  },
+  
+  /* 绘制调味图案 */
+  drawSeason(cctx, cx, cy, size, color) {
+    cctx.save();
+    cctx.translate(cx, cy);
+    const s = size / 100;
+    
+    // 调料瓶
+    cctx.fillStyle = '#8b7355';
+    cctx.beginPath();
+    cctx.roundRect(-15*s, -30*s, 30*s, 50*s, 5*s);
+    cctx.fill();
+    
+    // 瓶身标签
+    cctx.fillStyle = '#f5f5dc';
+    cctx.beginPath();
+    cctx.roundRect(-10*s, -5*s, 20*s, 20*s, 2*s);
+    cctx.fill();
+    
+    // 瓶口
+    cctx.fillStyle = '#a0522d';
+    cctx.beginPath();
+    cctx.roundRect(-8*s, -40*s, 16*s, 15*s, 3*s);
+    cctx.fill();
+    
+    // 盐/糖粒
+    cctx.fillStyle = '#fff';
+    for (let i = 0; i < 8; i++) {
+      const x = -15*s + Math.random() * 30*s;
+      const y = -55*s + Math.random() * 15*s;
+      cctx.beginPath();
+      cctx.arc(x, y, 2*s, 0, Math.PI*2);
+      cctx.fill();
+    }
+    
+    // 箭头指示
+    cctx.strokeStyle = '#ff6b35';
+    cctx.lineWidth = 2*s;
+    cctx.setLineDash([3*s, 3*s]);
+    cctx.beginPath();
+    cctx.moveTo(0, -55*s);
+    cctx.lineTo(0, -70*s);
+    cctx.stroke();
+    cctx.setLineDash([]);
+    
+    cctx.restore();
+  },
+  
+  /* 绘制出锅图案 */
+  drawServe(cctx, cx, cy, size, color) {
+    cctx.save();
+    cctx.translate(cx, cy);
+    const s = size / 100;
+    
+    // 盘子
+    cctx.fillStyle = '#f5f5f5';
+    cctx.beginPath();
+    cctx.ellipse(0, 20*s, 50*s, 15*s, 0, 0, Math.PI*2);
+    cctx.fill();
+    cctx.fillStyle = '#e8e8e8';
+    cctx.beginPath();
+    cctx.ellipse(0, 15*s, 40*s, 12*s, 0, 0, Math.PI*2);
+    cctx.fill();
+    cctx.beginPath();
+    cctx.ellipse(0, 10*s, 30*s, 9*s, 0, 0, Math.PI*2);
+    cctx.fill();
+    
+    // 食物
+    cctx.fillStyle = '#d2691e';
+    cctx.beginPath();
+    cctx.ellipse(-10*s, 5*s, 20*s, 12*s, 0, 0, Math.PI*2);
+    cctx.fill();
+    cctx.fillStyle = 'rgba(255,255,255,0.2)';
+    cctx.beginPath();
+    cctx.ellipse(-10*s, 0, 20*s, 5*s, 0, 0, Math.PI*2);
+    cctx.fill();
+    
+    // 蒸汽
+    cctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    cctx.lineWidth = 2*s;
+    cctx.lineCap = 'round';
+    cctx.beginPath();
+    cctx.moveTo(-20*s, -15*s);
+    cctx.quadraticCurveTo(-25*s, -30*s, -20*s, -40*s);
+    cctx.stroke();
+    cctx.beginPath();
+    cctx.moveTo(0, -10*s);
+    cctx.quadraticCurveTo(5*s, -25*s, 0, -35*s);
+    cctx.stroke();
+    
+    // 装饰
+    cctx.fillStyle = '#228b22';
+    cctx.beginPath();
+    cctx.moveTo(-30*s, 5*s);
+    cctx.lineTo(-25*s, -10*s);
+    cctx.lineTo(-20*s, 5*s);
+    cctx.closePath();
+    cctx.fill();
+    
+    cctx.restore();
+  },
+  
+  /* 绘制煸炒图案 */
+  drawSear(cctx, cx, cy, size, color) {
+    cctx.save();
+    cctx.translate(cx, cy);
+    const s = size / 100;
+    
+    // 锅
+    cctx.fillStyle = '#1a1a1a';
+    cctx.beginPath();
+    cctx.ellipse(0, 20*s, 45*s, 12*s, 0, 0, Math.PI);
+    cctx.arc(0, 20*s, 45*s, Math.PI, 0, true);
+    cctx.fill();
+    
+    // 肉
+    cctx.fillStyle = '#ff6b6b';
+    cctx.beginPath();
+    cctx.roundRect(-25*s, 5*s, 20*s, 15*s, 3*s);
+    cctx.fill();
+    cctx.fillStyle = 'rgba(255,200,150,0.4)';
+    cctx.beginPath();
+    cctx.roundRect(-25*s, 5*s, 20*s, 5*s, 3*s);
+    cctx.fill();
+    
+    // 油
+    cctx.fillStyle = '#ffd700';
+    cctx.beginPath();
+    cctx.ellipse(10*s, 12*s, 15*s, 6*s, 0, 0, Math.PI*2);
+    cctx.fill();
+    
+    // 火花/油爆
+    cctx.fillStyle = '#ff4500';
+    cctx.beginPath();
+    cctx.arc(15*s, -5*s, 3*s, 0, Math.PI*2);
+    cctx.arc(-5*s, -8*s, 2*s, 0, Math.PI*2);
+    cctx.arc(25*s, -2*s, 2*s, 0, Math.PI*2);
+    cctx.fill();
+    
+    // 锅铲
+    cctx.save();
+    cctx.translate(-30*s, -5*s);
+    cctx.rotate(0.3);
+    cctx.fillStyle = '#c0c0c0';
+    cctx.beginPath();
+    cctx.roundRect(0, 0, 8*s, 25*s, 2*s);
+    cctx.fill();
+    cctx.fillStyle = '#4a3728';
+    cctx.fillRect(0, 25*s, 6*s, 30*s);
+    cctx.restore();
+    
+    cctx.restore();
+  },
+  
+  /* 绘制加料图案 */
+  drawAdd(cctx, cx, cy, size, color) {
+    cctx.save();
+    cctx.translate(cx, cy);
+    const s = size / 100;
+    
+    // 碗/盆
+    cctx.fillStyle = '#f5f5dc';
+    cctx.beginPath();
+    cctx.ellipse(0, 20*s, 35*s, 10*s, 0, 0, Math.PI*2);
+    cctx.fill();
+    cctx.fillStyle = '#fff8dc';
+    cctx.beginPath();
+    cctx.moveTo(-35*s, 20*s);
+    cctx.quadraticCurveTo(-30*s, -10*s, 0, -15*s);
+    cctx.quadraticCurveTo(30*s, -10*s, 35*s, 20*s);
+    cctx.fill();
+    
+    // 内容物
+    cctx.fillStyle = '#8b4513';
+    cctx.beginPath();
+    cctx.ellipse(-10*s, 10*s, 12*s, 6*s, 0.3, 0, Math.PI*2);
+    cctx.fill();
+    cctx.fillStyle = '#228b22';
+    cctx.beginPath();
+    cctx.ellipse(15*s, 8*s, 8*s, 5*s, -0.2, 0, Math.PI*2);
+    cctx.fill();
+    
+    // 倒的东西
+    cctx.fillStyle = '#654321';
+    cctx.beginPath();
+    cctx.roundRect(-5*s, -45*s, 10*s, 25*s, 2*s);
+    cctx.fill();
+    
+    // 箭头
+    cctx.strokeStyle = '#ff6b35';
+    cctx.lineWidth = 2*s;
+    cctx.setLineDash([3*s, 3*s]);
+    cctx.beginPath();
+    cctx.moveTo(0, -25*s);
+    cctx.lineTo(0, -10*s);
+    cctx.stroke();
+    cctx.setLineDash([]);
+    
+    cctx.restore();
+  },
+  
+  /* 绘制收汁图案 */
+  drawReduce(cctx, cx, cy, size, color) {
+    cctx.save();
+    cctx.translate(cx, cy);
+    const s = size / 100;
+    
+    // 锅
+    cctx.fillStyle = '#2c2c2c';
+    cctx.beginPath();
+    cctx.ellipse(0, 15*s, 40*s, 12*s, 0, 0, Math.PI);
+    cctx.arc(0, 15*s, 40*s, Math.PI, 0, true);
+    cctx.fill();
+    
+    // 浓稠汁
+    cctx.fillStyle = '#8b0000';
+    cctx.beginPath();
+    cctx.ellipse(0, 10*s, 30*s, 8*s, 0, 0, Math.PI*2);
+    cctx.fill();
+    
+    // 食物
+    cctx.fillStyle = '#d2691e';
+    cctx.beginPath();
+    cctx.ellipse(-10*s, 5*s, 12*s, 8*s, 0, 0, Math.PI*2);
+    cctx.fill();
+    cctx.beginPath();
+    cctx.ellipse(10*s, 8*s, 10*s, 6*s, 0, 0, Math.PI*2);
+    cctx.fill();
+    
+    // 浓稠感 - 气泡
+    cctx.fillStyle = '#a52a2a';
+    cctx.beginPath();
+    cctx.arc(-15*s, 8*s, 3*s, 0, Math.PI*2);
+    cctx.arc(5*s, 5*s, 2*s, 0, Math.PI*2);
+    cctx.arc(15*s, 10*s, 2*s, 0, Math.PI*2);
+    cctx.fill();
+    
+    // 蒸汽（少）
+    cctx.strokeStyle = 'rgba(255,255,255,0.3)';
+    cctx.lineWidth = 1*s;
+    cctx.lineCap = 'round';
+    cctx.beginPath();
+    cctx.moveTo(-15*s, -10*s);
+    cctx.quadraticCurveTo(-20*s, -20*s, -15*s, -25*s);
+    cctx.stroke();
+    cctx.beginPath();
+    cctx.moveTo(15*s, -8*s);
+    cctx.quadraticCurveTo(20*s, -18*s, 15*s, -22*s);
+    cctx.stroke();
+    
+    // 箭头向下
+    cctx.strokeStyle = '#ff6b35';
+    cctx.lineWidth = 3*s;
+    cctx.lineCap = 'round';
+    cctx.beginPath();
+    cctx.moveTo(0, -35*s);
+    cctx.lineTo(0, -20*s);
+    cctx.stroke();
+    cctx.beginPath();
+    cctx.moveTo(-8*s, -28*s);
+    cctx.lineTo(0, -20*s);
+    cctx.lineTo(8*s, -28*s);
+    cctx.stroke();
+    
+    cctx.restore();
+  },
+  
+  /* 绘制蒸制图案 */
+  drawSteam(cctx, cx, cy, size, color) {
+    cctx.save();
+    cctx.translate(cx, cy);
+    const s = size / 100;
+    
+    // 蒸笼
+    cctx.fillStyle = '#deb887';
+    cctx.strokeStyle = '#8b7355';
+    cctx.lineWidth = 2*s;
+    
+    for (let i = 0; i < 3; i++) {
+      const y = -20*s + i * 20*s;
+      cctx.beginPath();
+      cctx.roundRect(-35*s, y, 70*s, 15*s, 3*s);
+      cctx.fill();
+      cctx.stroke();
+      
+      // 竹编纹理
+      cctx.strokeStyle = '#c9a86c';
+      cctx.lineWidth = 1*s;
+      for (let j = -30; j < 30; j += 10) {
+        cctx.beginPath();
+        cctx.moveTo(j*s, y + 2*s);
+        cctx.lineTo(j*s, y + 13*s);
+        cctx.stroke();
+      }
+    }
+    
+    // 蒸汽
+    cctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    cctx.lineWidth = 3*s;
+    cctx.lineCap = 'round';
+    for (let i = 0; i < 4; i++) {
+      const x = -25*s + i * 18*s;
+      cctx.beginPath();
+      cctx.moveTo(x, -50*s);
+      cctx.quadraticCurveTo(x + 8*s, -70*s, x, -85*s);
+      cctx.stroke();
+    }
+    
+    cctx.restore();
+  },
+  
+  /* 绘制油炸图案 */
+  drawFry(cctx, cx, cy, size, color) {
+    cctx.save();
+    cctx.translate(cx, cy);
+    const s = size / 100;
+    
+    // 油锅
+    cctx.fillStyle = '#ffd700';
+    cctx.beginPath();
+    cctx.ellipse(0, 10*s, 40*s, 15*s, 0, 0, Math.PI);
+    cctx.arc(0, 10*s, 40*s, Math.PI, 0, true);
+    cctx.fill();
+    
+    // 油面
+    cctx.fillStyle = '#ffec8b';
+    cctx.beginPath();
+    cctx.ellipse(0, 5*s, 35*s, 10*s, 0, 0, Math.PI*2);
+    cctx.fill();
+    
+    // 食物
+    cctx.fillStyle = '#deb887';
+    cctx.beginPath();
+    cctx.ellipse(-15*s, 0, 10*s, 8*s, 0.2, 0, Math.PI*2);
+    cctx.fill();
+    cctx.beginPath();
+    cctx.ellipse(10*s, -3*s, 8*s, 6*s, -0.3, 0, Math.PI*2);
+    cctx.fill();
+    
+    // 泡泡
+    cctx.fillStyle = 'rgba(255,255,150,0.6)';
+    cctx.beginPath();
+    cctx.arc(-20*s, 5*s, 4*s, 0, Math.PI*2);
+    cctx.arc(5*s, 8*s, 3*s, 0, Math.PI*2);
+    cctx.arc(20*s, 3*s, 3*s, 0, Math.PI*2);
+    cctx.fill();
+    
+    // 蒸汽
+    cctx.strokeStyle = 'rgba(255,255,255,0.4)';
+    cctx.lineWidth = 2*s;
+    cctx.lineCap = 'round';
+    cctx.beginPath();
+    cctx.moveTo(-25*s, -20*s);
+    cctx.quadraticCurveTo(-30*s, -35*s, -25*s, -50*s);
+    cctx.stroke();
+    cctx.beginPath();
+    cctx.moveTo(25*s, -20*s);
+    cctx.quadraticCurveTo(30*s, -35*s, 25*s, -50*s);
+    cctx.stroke();
+    
+    cctx.restore();
+  },
+  
+  /* 绘制腌制图案 */
+  drawMarinate(cctx, cx, cy, size, color) {
+    cctx.save();
+    cctx.translate(cx, cy);
+    const s = size / 100;
+    
+    // 保鲜盒
+    cctx.fillStyle = 'rgba(200,220,255,0.5)';
+    cctx.strokeStyle = '#a0a0c0';
+    cctx.lineWidth = 2*s;
+    cctx.beginPath();
+    cctx.roundRect(-35*s, -25*s, 70*s, 55*s, 5*s);
+    cctx.fill();
+    cctx.stroke();
+    
+    // 肉
+    cctx.fillStyle = '#ff6b6b';
+    cctx.beginPath();
+    cctx.roundRect(-25*s, -10*s, 30*s, 25*s, 3*s);
+    cctx.fill();
+    cctx.fillStyle = 'rgba(255,255,255,0.2)';
+    cctx.beginPath();
+    cctx.roundRect(-25*s, -10*s, 30*s, 8*s, 3*s);
+    cctx.fill();
+    
+    // 酱料
+    cctx.fillStyle = '#8b4513';
+    cctx.globalAlpha = 0.6;
+    cctx.beginPath();
+    cctx.ellipse(-10*s, 5*s, 20*s, 8*s, 0, 0, Math.PI*2);
+    cctx.fill();
+    cctx.globalAlpha = 1;
+    
+    // 时钟
+    cctx.fillStyle = '#fff';
+    cctx.beginPath();
+    cctx.arc(25*s, -15*s, 12*s, 0, Math.PI*2);
+    cctx.fill();
+    cctx.strokeStyle = '#333';
+    cctx.lineWidth = 2*s;
+    cctx.stroke();
+    
+    // 时针
+    cctx.beginPath();
+    cctx.moveTo(25*s, -15*s);
+    cctx.lineTo(25*s, -22*s);
+    cctx.stroke();
+    
+    cctx.restore();
+  },
+  
+  /* 绘制搅拌图案 */
+  drawWhisk(cctx, cx, cy, size, color) {
+    cctx.save();
+    cctx.translate(cx, cy);
+    const s = size / 100;
+    
+    // 碗
+    cctx.fillStyle = '#f5f5f5';
+    cctx.beginPath();
+    cctx.ellipse(0, 15*s, 40*s, 12*s, 0, 0, Math.PI*2);
+    cctx.fill();
+    cctx.fillStyle = '#fff';
+    cctx.beginPath();
+    cctx.moveTo(-40*s, 15*s);
+    cctx.quadraticCurveTo(-35*s, -20*s, 0, -25*s);
+    cctx.quadraticCurveTo(35*s, -20*s, 40*s, 15*s);
+    cctx.fill();
+    
+    // 蛋液
+    cctx.fillStyle = '#ffd700';
+    cctx.beginPath();
+    cctx.ellipse(0, 5*s, 30*s, 8*s, 0, 0, Math.PI*2);
+    cctx.fill();
+    
+    // 打蛋器
+    cctx.save();
+    cctx.translate(15*s, -30*s);
+    cctx.rotate(-0.2);
+    cctx.strokeStyle = '#c0c0c0';
+    cctx.lineWidth = 3*s;
+    
+    // 主体
+    cctx.beginPath();
+    cctx.moveTo(0, 0);
+    cctx.lineTo(0, 40*s);
+    cctx.stroke();
+    
+    // 圈
+    cctx.beginPath();
+    cctx.arc(0, 50*s, 12*s, 0, Math.PI*2);
+    cctx.stroke();
+    cctx.beginPath();
+    cctx.arc(0, 50*s, 8*s, 0, Math.PI*2);
+    cctx.stroke();
+    cctx.beginPath();
+    cctx.arc(0, 50*s, 4*s, 0, Math.PI*2);
+    cctx.stroke();
+    
+    // 柄
+    cctx.strokeStyle = '#4a3728';
+    cctx.lineWidth = 4*s;
+    cctx.beginPath();
+    cctx.moveTo(0, 0);
+    cctx.lineTo(0, -35*s);
+    cctx.stroke();
+    
+    cctx.restore();
+    cctx.restore();
+  },
+  
+  /* 绘制成品图案 */
+  drawDish(cctx, cx, cy, size, color) {
+    cctx.save();
+    cctx.translate(cx, cy);
+    const s = size / 100;
+    
+    // 精美盘子
+    cctx.fillStyle = '#fff';
+    cctx.beginPath();
+    cctx.ellipse(0, 20*s, 50*s, 15*s, 0, 0, Math.PI*2);
+    cctx.fill();
+    cctx.strokeStyle = '#d4af37';
+    cctx.lineWidth = 3*s;
+    cctx.stroke();
+    cctx.strokeStyle = '#c0c0c0';
+    cctx.lineWidth = 1*s;
+    cctx.beginPath();
+    cctx.ellipse(0, 15*s, 40*s, 12*s, 0, 0, Math.PI*2);
+    cctx.stroke();
+    
+    // 主菜
+    cctx.fillStyle = '#d2691e';
+    cctx.beginPath();
+    cctx.ellipse(-5*s, 8*s, 25*s, 15*s, 0, 0, Math.PI*2);
+    cctx.fill();
+    cctx.fillStyle = 'rgba(139,69,19,0.3)';
+    cctx.beginPath();
+    cctx.ellipse(-5*s, 5*s, 25*s, 8*s, 0, 0, Math.PI*2);
+    cctx.fill();
+    
+    // 高光
+    cctx.fillStyle = 'rgba(255,255,255,0.3)';
+    cctx.beginPath();
+    cctx.ellipse(-10*s, 2*s, 10*s, 5*s, -0.3, 0, Math.PI*2);
+    cctx.fill();
+    
+    // 装饰
+    cctx.fillStyle = '#228b22';
+    cctx.beginPath();
+    cctx.moveTo(-30*s, 10*s);
+    cctx.quadraticCurveTo(-25*s, -5*s, -20*s, 10*s);
+    cctx.quadraticCurveTo(-25*s, 0, -30*s, 10*s);
+    cctx.fill();
+    
+    // 蒸汽
+    cctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    cctx.lineWidth = 2*s;
+    cctx.lineCap = 'round';
+    cctx.beginPath();
+    cctx.moveTo(-20*s, -15*s);
+    cctx.quadraticCurveTo(-25*s, -30*s, -20*s, -40*s);
+    cctx.stroke();
+    cctx.beginPath();
+    cctx.moveTo(5*s, -10*s);
+    cctx.quadraticCurveTo(10*s, -25*s, 5*s, -35*s);
+    cctx.stroke();
+    cctx.beginPath();
+    cctx.moveTo(20*s, -15*s);
+    cctx.quadraticCurveTo(25*s, -30*s, 20*s, -40*s);
+    cctx.stroke();
+    
+    // 星星装饰
+    cctx.fillStyle = '#ffd700';
+    cctx.font = `${12*s}px sans-serif`;
+    cctx.fillText('★', -35*s, -5*s);
+    cctx.fillText('★', 30*s, -8*s);
+    
+    cctx.restore();
+  },
+  
+  /* 绘制食材展示图案 */
+  drawIngredients(cctx, cx, cy, size, color) {
+    cctx.save();
+    cctx.translate(cx, cy);
+    const s = size / 100;
+    
+    // 木板背景
+    cctx.fillStyle = '#deb887';
+    cctx.beginPath();
+    cctx.roundRect(-45*s, -40*s, 90*s, 80*s, 8*s);
+    cctx.fill();
+    
+    // 木纹
+    cctx.strokeStyle = '#c9a86c';
+    cctx.lineWidth = 1*s;
+    for (let i = -35; i < 40; i += 12) {
+      cctx.beginPath();
+      cctx.moveTo(i*s, -38*s);
+      cctx.lineTo(i*s, 38*s);
+      cctx.stroke();
+    }
+    
+    // 各种食材
+    // 肉
+    cctx.fillStyle = '#ff6b6b';
+    cctx.beginPath();
+    cctx.roundRect(-35*s, -25*s, 25*s, 20*s, 3*s);
+    cctx.fill();
+    
+    // 蔬菜
+    cctx.fillStyle = '#228b22';
+    cctx.beginPath();
+    cctx.ellipse(-5*s, -15*s, 15*s, 12*s, 0, 0, Math.PI*2);
+    cctx.fill();
+    
+    // 调料
+    cctx.fillStyle = '#8b4513';
+    cctx.beginPath();
+    cctx.roundRect(15*s, -20*s, 12*s, 25*s, 2*s);
+    cctx.fill();
+    cctx.fillStyle = '#654321';
+    cctx.beginPath();
+    cctx.roundRect(15*s, -25*s, 12*s, 8*s, 2*s);
+    cctx.fill();
+    
+    // 葱姜蒜
+    cctx.fillStyle = '#f5f5dc';
+    cctx.beginPath();
+    cctx.ellipse(-25*s, 10*s, 8*s, 5*s, 0.3, 0, Math.PI*2);
+    cctx.fill();
+    cctx.fillStyle = '#fff';
+    cctx.beginPath();
+    cctx.ellipse(-15*s, 12*s, 6*s, 4*s, -0.2, 0, Math.PI*2);
+    cctx.fill();
+    
+    cctx.restore();
+  }
 };
 
-/* 根据步骤描述获取对应图标 */
-function getCookingIcon(text) {
-  for (const [keyword, icon] of Object.entries(COOKING_ICONS)) {
-    if (text.includes(keyword)) return icon;
+/* 图案类型映射 */
+const PATTERN_TYPES = {
+  'cut': { keywords: ['切', '切丁', '切块', '切片', '切丝', '剁'], draw: 'drawCut' },
+  'stirfry': { keywords: ['炒', '翻炒', '煸炒', '爆炒'], draw: 'drawStirfry' },
+  'boil': { keywords: ['煮', '焯水', '炖', '熬', '焖'], draw: 'drawBoil' },
+  'season': { keywords: ['调味', '加盐', '加酱油', '加糖', '加料酒', '撒', '放盐'], draw: 'drawSeason' },
+  'serve': { keywords: ['出锅', '装盘', '盛出', '出碟'], draw: 'drawServe' },
+  'sear': { keywords: ['煸', '煎', '烙'], draw: 'drawSear' },
+  'add': { keywords: ['倒入', '加入', '放', '添', '淋', '倒'], draw: 'drawAdd' },
+  'reduce': { keywords: ['收汁', '勾芡', '浓稠'], draw: 'drawReduce' },
+  'steam': { keywords: ['蒸', '清蒸'], draw: 'drawSteam' },
+  'fry': { keywords: ['炸', '油炸', '酥炸'], draw: 'drawFry' },
+  'marinate': { keywords: ['腌', '腌制', '泡', '浸泡'], draw: 'drawMarinate' },
+  'whisk': { keywords: ['搅拌', '打散', '打发', '拌匀', '混'], draw: 'drawWhisk' },
+  'dish': { keywords: ['成品', '摆盘', '展示', '完成'], draw: 'drawDish' },
+  'ingredients': { keywords: ['食材', '材料', '备料', '准备', '展示'], draw: 'drawIngredients' }
+};
+
+/* 获取匹配的图案类型 */
+function getPatternType(text) {
+  text = text.toLowerCase();
+  for (const [type, config] of Object.entries(PATTERN_TYPES)) {
+    for (const keyword of config.keywords) {
+      if (text.includes(keyword)) {
+        return type;
+      }
+    }
   }
-  return '🍳';
+  return 'stirfry'; // 默认
 }
 
 /* 绘制步骤场景 - 图文同步版 */
@@ -2256,17 +3069,38 @@ function drawStepScene(cx, script, shot, t, duration, img) {
   cx.save();
   cx.globalAlpha = fadeIn;
   
+  // 使用真实的烹饪图案
   if (!img) {
-    const mainIcon = getCookingIcon(shot.visual || shot.narration || '');
-    const iconSize = 80;
-    cx.font = `${iconSize}px sans-serif`;
-    cx.textAlign = 'center';
-    cx.textBaseline = 'middle';
-    const iconY = contentTop + contentH * 0.35;
-    const iconBounce = Math.sin(t * 3) * 5;
-    cx.shadowColor = 'rgba(255,107,53,0.3)';
-    cx.shadowBlur = 20;
-    cx.fillText(mainIcon, VW/2, iconY + iconBounce);
+    const stepText = shot.visual || shot.scene || shot.audio || '';
+    const patternType = getPatternType(stepText);
+    const patternConfig = PATTERN_TYPES[patternType];
+    const patternFunc = PatternDrawer[patternConfig.draw];
+    
+    // 创建图案画布
+    const patternCanvas = document.createElement('canvas');
+    patternCanvas.width = 400;
+    patternCanvas.height = 300;
+    const patternCtx = patternCanvas.getContext('2d');
+    
+    // 绘制图案
+    patternFunc(patternCtx, 200, 150, 300, '#ff6b35');
+    
+    // 添加到主画布（居中显示）
+    const patternY = contentTop + contentH * 0.3;
+    const patternH = Math.min(200, contentH * 0.5);
+    const patternW = patternH * (400 / 300);
+    const patternX = (VW - patternW) / 2;
+    
+    cx.drawImage(patternCanvas, patternX, patternY, patternW, patternH);
+    
+    // 添加装饰光晕
+    cx.shadowColor = 'rgba(255,107,53,0.4)';
+    cx.shadowBlur = 30;
+    cx.strokeStyle = 'rgba(255,107,53,0.3)';
+    cx.lineWidth = 3;
+    cx.beginPath();
+    cx.ellipse(VW/2, patternY + patternH/2, patternW/2 + 10, patternH/2 + 10, 0, 0, Math.PI*2);
+    cx.stroke();
     cx.shadowBlur = 0;
   }
   
@@ -2434,6 +3268,7 @@ function buildVideoScenes(script) {
       shot,
       duration: shot.duration,
       imageUrl: imgLib[idx % imgLib.length],
+      img: null, // 图片稍后加载
     });
   });
   
@@ -2697,15 +3532,19 @@ function compressImage(dataUrl, maxWidth, quality) {
   });
 }
 
-/* 更新视频预览首帧 */
+/* 更新视频预览首帧 - 显示第一个步骤场景 */
 function updateVideoPreview() {
   if (!state.currentScript) return;
   const canvas = $('video-canvas');
   const ctx = canvas.getContext('2d');
   const scenes = buildVideoScenes(state.currentScript);
   preloadVideoImages(state.currentScript).then(() => {
-    const img = getStepImage(state.currentScript, 0);
-    drawCoverScene(ctx, state.currentScript, 0, scenes[0].duration, img);
+    // 找到第一个步骤场景
+    const stepScene = scenes.find(s => s.type === 'step') || scenes[1];
+    if (stepScene) {
+      const img = stepScene.img;
+      drawStepScene(ctx, state.currentScript, stepScene.shot, 0, stepScene.duration, img);
+    }
   });
 }
 
